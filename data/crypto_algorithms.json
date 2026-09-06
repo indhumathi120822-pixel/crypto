@@ -1,0 +1,3166 @@
+[
+  {
+    "id": "aes-128",
+    "name": "AES-128",
+    "aliases": [
+      "aes128",
+      "aes_128",
+      "rijndael-128"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "CURRENT",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "SECURE",
+    "risk_level": "MEDIUM",
+    "key_sizes": [
+      128
+    ],
+    "recommended_replacement": [
+      "AES-256 (for 128-bit post-quantum security margin)"
+    ],
+    "detection_patterns": [
+      "aes-128",
+      "aes_128",
+      "AES/CBC",
+      "AES/ECB",
+      "AES-128-CBC",
+      "AES_128_CBC",
+      "AES_128_CTR"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "csharp",
+      "php",
+      "ruby",
+      "rust"
+    ],
+    "notes": "Standard symmetric cipher. Grover algorithm reduces brute-force complexity from 128 to 64 bits. For long-term quantum security margin, consider AES-256."
+  },
+  {
+    "id": "aes-192",
+    "name": "AES-192",
+    "aliases": [
+      "aes192",
+      "aes_192"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "CURRENT",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      192
+    ],
+    "recommended_replacement": [
+      "AES-256"
+    ],
+    "detection_patterns": [
+      "aes-192",
+      "aes_192",
+      "AES/CBC/PKCS5Padding",
+      "AES-192-CBC"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp"
+    ],
+    "notes": "Symmetric cipher with 192-bit key. Grover reduces effective security to 96 bits."
+  },
+  {
+    "id": "aes-256",
+    "name": "AES-256",
+    "aliases": [
+      "aes256",
+      "aes_256",
+      "rijndael-256"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation; verify authenticated mode (GCM/CCM)"
+    ],
+    "detection_patterns": [
+      "aes-256",
+      "aes_256",
+      "AES-256-CBC",
+      "AES-256-CTR",
+      "AES/CBC",
+      "AES.new"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "csharp",
+      "php",
+      "ruby",
+      "rust"
+    ],
+    "notes": "Gold standard symmetric encryption. 256-bit key yields 128-bit quantum security against Grover algorithm, which is considered quantum-safe."
+  },
+  {
+    "id": "des",
+    "name": "DES",
+    "aliases": [
+      "data encryption standard",
+      "des-cbc",
+      "des-ecb"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "DEPRECATED",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "BROKEN",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      56
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM",
+      "ChaCha20-Poly1305"
+    ],
+    "detection_patterns": [
+      "des-cbc",
+      "des-ecb",
+      "DES.new",
+      "Cipher.getInstance(\"DES",
+      "openssl_des",
+      "crypto/des"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "php"
+    ],
+    "notes": "Classically broken due to small 56-bit key space. Vulnerable to fast brute-force attacks in minutes."
+  },
+  {
+    "id": "3des",
+    "name": "3DES",
+    "aliases": [
+      "triple des",
+      "des3",
+      "des-ede3",
+      "tripledes"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "DEPRECATED",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "WEAK",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      112,
+      168
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "des-ede3",
+      "des3",
+      "DES3.new",
+      "TripleDES",
+      "Cipher.getInstance(\"DESede",
+      "crypto/des"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "csharp"
+    ],
+    "notes": "Deprecated by NIST (disallowed after 2023). Sweet32 collision attacks on 64-bit block size."
+  },
+  {
+    "id": "blowfish",
+    "name": "Blowfish",
+    "aliases": [
+      "blowfish-cbc",
+      "bf-cbc"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "LEGACY",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "WEAK",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      "32-448"
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM",
+      "Twofish"
+    ],
+    "detection_patterns": [
+      "blowfish",
+      "bf-cbc",
+      "Blowfish.new",
+      "Cipher.getInstance(\"Blowfish"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "java",
+      "c",
+      "cpp",
+      "php"
+    ],
+    "notes": "64-bit block size suffers from Sweet32 collision vulnerability when processing large volumes of data."
+  },
+  {
+    "id": "twofish",
+    "name": "Twofish",
+    "aliases": [
+      "twofish-cbc"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "LEGACY",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      128,
+      192,
+      256
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "twofish",
+      "Twofish",
+      "twofish-cbc"
+    ],
+    "languages": [
+      "python",
+      "c",
+      "cpp",
+      "java",
+      "go"
+    ],
+    "notes": "AES finalist with 128-bit block size. Still classically secure, though AES has broader hardware acceleration."
+  },
+  {
+    "id": "camellia-128",
+    "name": "Camellia-128",
+    "aliases": [
+      "camellia128"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "CURRENT",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "SECURE",
+    "risk_level": "MEDIUM",
+    "key_sizes": [
+      128
+    ],
+    "recommended_replacement": [
+      "Camellia-256",
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "camellia-128",
+      "camellia128",
+      "Camellia/CBC"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java",
+      "python"
+    ],
+    "notes": "Japanese/European standard cipher with security comparable to AES-128. 64-bit effective quantum margin."
+  },
+  {
+    "id": "camellia-192",
+    "name": "Camellia-192",
+    "aliases": [
+      "camellia192"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "CURRENT",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      192
+    ],
+    "recommended_replacement": [
+      "Camellia-256",
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "camellia-192",
+      "camellia192"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java",
+      "python"
+    ],
+    "notes": "192-bit variant of Camellia."
+  },
+  {
+    "id": "camellia-256",
+    "name": "Camellia-256",
+    "aliases": [
+      "camellia256"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation with authenticated mode"
+    ],
+    "detection_patterns": [
+      "camellia-256",
+      "camellia256"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java",
+      "python"
+    ],
+    "notes": "256-bit key provides 128-bit security margin under Grover algorithm."
+  },
+  {
+    "id": "idea",
+    "name": "IDEA",
+    "aliases": [
+      "international data encryption algorithm"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "LEGACY",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "WEAK",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      128
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "idea-cbc",
+      "Cipher.getInstance(\"IDEA"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "64-bit block cipher historically used in PGP 2.0. Vulnerable to birthday bound / Sweet32 collision attacks."
+  },
+  {
+    "id": "rc2",
+    "name": "RC2",
+    "aliases": [
+      "rivest cipher 2",
+      "arc2"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "DEPRECATED",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "BROKEN",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      "8-1024"
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "rc2-cbc",
+      "rc2-40",
+      "Cipher.getInstance(\"RC2"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java",
+      "python",
+      "javascript"
+    ],
+    "notes": "Weak 64-bit block cipher vulnerable to related-key and chosen-plaintext attacks."
+  },
+  {
+    "id": "rc4",
+    "name": "RC4",
+    "aliases": [
+      "arcfour",
+      "rivest cipher 4"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Stream Cipher",
+    "status": "DEPRECATED",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "BROKEN",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      "40-2048"
+    ],
+    "recommended_replacement": [
+      "ChaCha20-Poly1305",
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "rc4",
+      "arcfour",
+      "ARC4.new",
+      "Cipher.getInstance(\"RC4",
+      "crypto/rc4"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "php"
+    ],
+    "notes": "Prohibited in TLS (RFC 7465). Severe statistical biases in initial keystream bytes allow plaintext recovery."
+  },
+  {
+    "id": "rc5",
+    "name": "RC5",
+    "aliases": [
+      "rivest cipher 5"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "LEGACY",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "WEAK",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      "0-2040"
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "rc5",
+      "RC5.new",
+      "rc5-cbc"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "Parameterized block cipher with known differential cryptanalysis attacks for common round configurations."
+  },
+  {
+    "id": "rc6",
+    "name": "RC6",
+    "aliases": [
+      "rivest cipher 6"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "LEGACY",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "MEDIUM",
+    "key_sizes": [
+      128,
+      192,
+      256
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "rc6",
+      "RC6"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "AES candidate algorithm with 128-bit block size. Still mathematically unbroken, but patent history limited adoption."
+  },
+  {
+    "id": "cast5",
+    "name": "CAST5",
+    "aliases": [
+      "cast-128",
+      "cast128"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "LEGACY",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "WEAK",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      "40-128"
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "cast5",
+      "cast-128",
+      "CAST.new",
+      "cast5-cbc"
+    ],
+    "languages": [
+      "python",
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "64-bit block size cipher defined in RFC 2144, vulnerable to collision attacks on high-throughput data."
+  },
+  {
+    "id": "cast-128",
+    "name": "CAST-128",
+    "aliases": [
+      "cast5",
+      "cast128"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "LEGACY",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "WEAK",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      128
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "cast128",
+      "cast-128-cbc"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "python",
+      "java"
+    ],
+    "notes": "Identical specification to CAST5. 64-bit block size limit."
+  },
+  {
+    "id": "serpent",
+    "name": "Serpent",
+    "aliases": [
+      "serpent-cbc"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "LEGACY",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      128,
+      192,
+      256
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "serpent",
+      "serpent-cbc"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "python",
+      "rust"
+    ],
+    "notes": "AES finalist renowned for conservative security margins with 32 rounds."
+  },
+  {
+    "id": "aria",
+    "name": "ARIA",
+    "aliases": [
+      "aria-128",
+      "aria-256"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      128,
+      192,
+      256
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM",
+      "ARIA-256-GCM"
+    ],
+    "detection_patterns": [
+      "aria-128",
+      "aria-256",
+      "aria-128-gcm",
+      "aria-256-gcm"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "Korean standard block cipher (RFC 5794). 256-bit variant provides solid post-quantum symmetric security."
+  },
+  {
+    "id": "seed",
+    "name": "SEED",
+    "aliases": [
+      "seed-cbc"
+    ],
+    "category": "SYMMETRIC_ENCRYPTION",
+    "type": "Block Cipher",
+    "status": "LEGACY",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "MEDIUM",
+    "key_sizes": [
+      128
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM",
+      "ARIA-256"
+    ],
+    "detection_patterns": [
+      "seed-cbc",
+      "seed",
+      "Cipher.getInstance(\"SEED"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "Korean 128-bit block cipher (RFC 4269). Largely superseded by ARIA and AES."
+  },
+  {
+    "id": "rsa",
+    "name": "RSA",
+    "aliases": [
+      "rsa-encryption",
+      "rsa-kem",
+      "pkcs1"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Public-Key Cryptosystem",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      1024,
+      2048,
+      3072,
+      4096
+    ],
+    "recommended_replacement": [
+      "ML-KEM (Kyber) for key encapsulation",
+      "Hybrid Classical + PQC (e.g. X25519 + ML-KEM)"
+    ],
+    "detection_patterns": [
+      "RSA.generate",
+      "RSA.new",
+      "KeyPairGenerator.getInstance(\"RSA",
+      "crypto/rsa",
+      "EVP_PKEY_RSA",
+      "from Crypto.PublicKey import RSA",
+      "crypto.generateKeyPair(\"rsa"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "csharp",
+      "php",
+      "ruby",
+      "rust"
+    ],
+    "notes": "Directly vulnerable to Shor polynomial-time algorithm on cryptanalytically relevant quantum computers (CRQC). Store-Now-Decrypt-Later (SNDL) threat applies to encrypted data."
+  },
+  {
+    "id": "rsa-oaep",
+    "name": "RSA-OAEP",
+    "aliases": [
+      "rsa/ecb/oaepwithsha-256andmgf1padding",
+      "rsa-oaep-256"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Public-Key Encryption",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      2048,
+      3072,
+      4096
+    ],
+    "recommended_replacement": [
+      "ML-KEM-768 / ML-KEM-1024",
+      "Hybrid ML-KEM + RSA-OAEP"
+    ],
+    "detection_patterns": [
+      "RSA/ECB/OAEP",
+      "RSA-OAEP",
+      "PKCS1_OAEP.new",
+      "crypto.constants.RSA_PKCS1_OAEP_PADDING"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp"
+    ],
+    "notes": "Optimal Asymmetric Encryption Padding provides classical IND-CCA2 security, but underlying integer factorization is broken by Shor algorithm."
+  },
+  {
+    "id": "rsa-pkcs1-v1_5",
+    "name": "RSA-PKCS#1 v1.5",
+    "aliases": [
+      "rsa-pkcs1",
+      "rsa/ecb/pkcs1padding"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Public-Key Encryption",
+    "status": "DEPRECATED",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "WEAK",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      1024,
+      2048
+    ],
+    "recommended_replacement": [
+      "ML-KEM-768",
+      "RSA-OAEP (transitional)"
+    ],
+    "detection_patterns": [
+      "PKCS1_v1_5.new",
+      "RSA/ECB/PKCS1Padding",
+      "RSA_PKCS1_PADDING"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "java",
+      "c",
+      "cpp"
+    ],
+    "notes": "Vulnerable to Bleichenbacher padding oracle attacks classically, and fully broken by Shor algorithm quantumly."
+  },
+  {
+    "id": "diffie-hellman",
+    "name": "Diffie-Hellman",
+    "aliases": [
+      "dh",
+      "dh-exchange"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Key Agreement",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      2048,
+      3072,
+      4096
+    ],
+    "recommended_replacement": [
+      "ML-KEM (FIPS 203)",
+      "Hybrid X25519 + ML-KEM-768"
+    ],
+    "detection_patterns": [
+      "DiffieHellman",
+      "crypto.createDiffieHellman",
+      "DH_new",
+      "KeyAgreement.getInstance(\"DH",
+      "crypto/dsa"
+    ],
+    "languages": [
+      "javascript",
+      "typescript",
+      "java",
+      "c",
+      "cpp",
+      "python",
+      "go"
+    ],
+    "notes": "Discrete logarithm problem over multiplicative groups is completely broken in polynomial time by Shor algorithm."
+  },
+  {
+    "id": "finite-field-dh",
+    "name": "Finite-Field DH",
+    "aliases": [
+      "ffdh",
+      "modp",
+      "dh-modp"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Key Agreement",
+    "status": "LEGACY",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      2048,
+      3072
+    ],
+    "recommended_replacement": [
+      "ML-KEM-768",
+      "ECDH with X25519 (classical bridge)"
+    ],
+    "detection_patterns": [
+      "modp",
+      "FFDHE",
+      "DiffieHellmanGroup"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "javascript",
+      "java"
+    ],
+    "notes": "Finite Field Diffie-Hellman requires large group parameters and is vulnerable to quantum discrete log attacks."
+  },
+  {
+    "id": "ecdh",
+    "name": "ECDH",
+    "aliases": [
+      "elliptic-curve diffie-hellman",
+      "ec-dh"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Key Agreement",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      256,
+      384,
+      521
+    ],
+    "recommended_replacement": [
+      "ML-KEM-768",
+      "Hybrid X25519 + ML-KEM-768"
+    ],
+    "detection_patterns": [
+      "crypto.createECDH",
+      "KeyAgreement.getInstance(\"ECDH",
+      "ECDH_compute_key",
+      "crypto/elliptic",
+      "ecdh.ECDH"
+    ],
+    "languages": [
+      "javascript",
+      "typescript",
+      "java",
+      "c",
+      "cpp",
+      "python",
+      "go",
+      "rust"
+    ],
+    "notes": "Elliptic curve discrete logarithm problem is efficiently solvable with a quantum computer using Shor algorithm."
+  },
+  {
+    "id": "x25519",
+    "name": "X25519",
+    "aliases": [
+      "curve25519-dh",
+      "cv25519"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Key Agreement",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Hybrid X25519 + ML-KEM-768",
+      "ML-KEM-768 (FIPS 203)"
+    ],
+    "detection_patterns": [
+      "x25519",
+      "curve25519",
+      "X25519PrivateKey",
+      "crypto.generateKeyPair(\"x25519"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "rust"
+    ],
+    "notes": "Modern, high-performance Curve25519 Montgomery form key exchange. Classically secure, but vulnerable to quantum Shor algorithm."
+  },
+  {
+    "id": "x448",
+    "name": "X448",
+    "aliases": [
+      "ed448-dh",
+      "curve448"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Key Agreement",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      448
+    ],
+    "recommended_replacement": [
+      "ML-KEM-1024",
+      "Hybrid X448 + ML-KEM-1024"
+    ],
+    "detection_patterns": [
+      "x448",
+      "curve448",
+      "X448PrivateKey"
+    ],
+    "languages": [
+      "python",
+      "c",
+      "cpp",
+      "go",
+      "rust"
+    ],
+    "notes": "High-security Montgomery curve (RFC 7748). Classically 224-bit security, vulnerable to quantum discrete log."
+  },
+  {
+    "id": "elgamal",
+    "name": "ElGamal",
+    "aliases": [
+      "elgamal-encryption"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Public-Key Encryption",
+    "status": "LEGACY",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      2048
+    ],
+    "recommended_replacement": [
+      "ML-KEM (Kyber)"
+    ],
+    "detection_patterns": [
+      "ElGamal.generate",
+      "ElGamal.new",
+      "elgamal"
+    ],
+    "languages": [
+      "python",
+      "java",
+      "c",
+      "cpp"
+    ],
+    "notes": "Based on Diffie-Hellman discrete logarithm assumption. Vulnerable to Shor quantum factorization."
+  },
+  {
+    "id": "ecies",
+    "name": "ECIES",
+    "aliases": [
+      "elliptic curve integrated encryption scheme"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Hybrid Encryption",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      256,
+      384
+    ],
+    "recommended_replacement": [
+      "ML-KEM combined with authenticated symmetric encryption (KEM-DEM paradigm)"
+    ],
+    "detection_patterns": [
+      "ecies",
+      "ECIES",
+      "Cipher.getInstance(\"ECIES"
+    ],
+    "languages": [
+      "java",
+      "python",
+      "c",
+      "cpp",
+      "javascript"
+    ],
+    "notes": "Combines ECC key agreement with symmetric cipher. The asymmetric ECC component is vulnerable to Shor algorithm."
+  },
+  {
+    "id": "rabin",
+    "name": "Rabin",
+    "aliases": [
+      "rabin cryptosystem"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Public-Key Encryption",
+    "status": "LEGACY",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "WEAK",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      1024,
+      2048
+    ],
+    "recommended_replacement": [
+      "ML-KEM"
+    ],
+    "detection_patterns": [
+      "rabin_cryptosystem",
+      "RabinKeyPairGenerator"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java",
+      "python"
+    ],
+    "notes": "Security provably equivalent to integer factorization. Broken by quantum Shor algorithm."
+  },
+  {
+    "id": "paillier",
+    "name": "Paillier",
+    "aliases": [
+      "paillier homomorphic cryptosystem"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Homomorphic Encryption",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      2048,
+      3072
+    ],
+    "recommended_replacement": [
+      "Lattice-based homomorphic schemes (BFV, BGV, CKKS)"
+    ],
+    "detection_patterns": [
+      "phe.paillier",
+      "PaillierKeypair",
+      "paillier"
+    ],
+    "languages": [
+      "python",
+      "c",
+      "cpp",
+      "rust"
+    ],
+    "notes": "Partially homomorphic cryptosystem based on Composite Residuosity. Decryption is broken by Shor quantum algorithm."
+  },
+  {
+    "id": "ntru",
+    "name": "NTRU",
+    "aliases": [
+      "ntruencrypt",
+      "ntru-kem"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Lattice-Based KEM",
+    "status": "POST_QUANTUM",
+    "quantum_status": "QUANTUM_SAFE",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      509,
+      677,
+      821
+    ],
+    "recommended_replacement": [
+      "ML-KEM (Kyber) for NIST FIPS 203 standardized compatibility"
+    ],
+    "detection_patterns": [
+      "ntru",
+      "NTRUEncrypt",
+      "ntru_kem"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "rust",
+      "java"
+    ],
+    "notes": "Pioneering lattice-based encryption algorithm. Resists both classical and quantum attacks; round 3 NIST finalist."
+  },
+  {
+    "id": "classic-mceliece",
+    "name": "Classic McEliece",
+    "aliases": [
+      "mceliece"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Code-Based KEM",
+    "status": "POST_QUANTUM",
+    "quantum_status": "QUANTUM_SAFE",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "348864",
+      "460896",
+      "6688128"
+    ],
+    "recommended_replacement": [
+      "NIST Round 4 selected code-based KEM; conservative long-term retention"
+    ],
+    "detection_patterns": [
+      "mceliece",
+      "ClassicMcEliece",
+      "pqcrypto_mceliece"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "rust"
+    ],
+    "notes": "Code-based cryptosystem with 45+ years of cryptanalytic validation. High quantum security with large public keys."
+  },
+  {
+    "id": "ml-kem",
+    "name": "ML-KEM / Kyber",
+    "aliases": [
+      "kyber",
+      "crystals-kyber",
+      "ml-kem-512",
+      "ml-kem-768",
+      "ml-kem-1024"
+    ],
+    "category": "ASYMMETRIC_KEY_EXCHANGE",
+    "type": "Module Lattice KEM",
+    "status": "POST_QUANTUM",
+    "quantum_status": "QUANTUM_SAFE",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      512,
+      768,
+      1024
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation; follow NIST FIPS 203 standard"
+    ],
+    "detection_patterns": [
+      "ml-kem",
+      "crystals-kyber",
+      "kyber512",
+      "kyber768",
+      "kyber1024",
+      "MLKEM",
+      "pqcrypto.kem.kyber"
+    ],
+    "languages": [
+      "python",
+      "rust",
+      "c",
+      "cpp",
+      "go",
+      "java",
+      "typescript"
+    ],
+    "notes": "NIST FIPS 203 standardized post-quantum key encapsulation mechanism. Primary recommended replacement for RSA/ECDH key agreement."
+  },
+  {
+    "id": "dsa",
+    "name": "DSA",
+    "aliases": [
+      "digital signature algorithm"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Digital Signature",
+    "status": "DEPRECATED",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "WEAK",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      1024,
+      2048,
+      3072
+    ],
+    "recommended_replacement": [
+      "ML-DSA (Dilithium - FIPS 204)",
+      "SLH-DSA (SPHINCS+ - FIPS 205)"
+    ],
+    "detection_patterns": [
+      "crypto/dsa",
+      "DSA.generate",
+      "Signature.getInstance(\"DSA",
+      "EVP_PKEY_DSA"
+    ],
+    "languages": [
+      "python",
+      "java",
+      "c",
+      "cpp",
+      "go"
+    ],
+    "notes": "Deprecated by NIST (FIPS 186-5). Discrete log broken by Shor algorithm. Prone to catastrophic private key recovery on nonce reuse."
+  },
+  {
+    "id": "rsa-pss",
+    "name": "RSA-PSS",
+    "aliases": [
+      "rsassa-pss",
+      "rsa/pss"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Digital Signature",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      2048,
+      3072,
+      4096
+    ],
+    "recommended_replacement": [
+      "ML-DSA (Dilithium)",
+      "Hybrid RSA-PSS + ML-DSA"
+    ],
+    "detection_patterns": [
+      "RSA-PSS",
+      "RSASSA-PSS",
+      "crypto.constants.RSA_PKCS1_PSS_PADDING",
+      "SHA256withRSA/PSS"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "c",
+      "cpp",
+      "go",
+      "rust"
+    ],
+    "notes": "Provably secure classical signature scheme (RFC 8017). Vulnerable to polynomial-time Shor factorization."
+  },
+  {
+    "id": "rsa-pkcs1-sig",
+    "name": "RSA-PKCS#1 Signature",
+    "aliases": [
+      "rsassa-pkcs1-v1_5",
+      "sha256withrsa"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Digital Signature",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      2048,
+      3072,
+      4096
+    ],
+    "recommended_replacement": [
+      "ML-DSA-65 (FIPS 204)",
+      "Ed25519 (interim classical)"
+    ],
+    "detection_patterns": [
+      "SHA256withRSA",
+      "PKCS1_v1_5.new",
+      "RSA_sign",
+      "crypto.createSign(\"RSA-SHA256"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "c",
+      "cpp",
+      "go",
+      "csharp"
+    ],
+    "notes": "Widespread signature scheme in X.509 PKI. Shor algorithm will allow private key derivation from public key."
+  },
+  {
+    "id": "ecdsa",
+    "name": "ECDSA",
+    "aliases": [
+      "elliptic curve dsa",
+      "secp256k1",
+      "secp256r1"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Digital Signature",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      256,
+      384,
+      521
+    ],
+    "recommended_replacement": [
+      "ML-DSA (Dilithium - FIPS 204)",
+      "SLH-DSA (SPHINCS+ - FIPS 205)"
+    ],
+    "detection_patterns": [
+      "crypto/ecdsa",
+      "ecdsa.SigningKey",
+      "Signature.getInstance(\"SHA256withECDSA",
+      "ECDSA_do_sign",
+      "secp256r1",
+      "secp256k1"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "rust"
+    ],
+    "notes": "Used across Bitcoin, Ethereum, TLS, and Apple Pay. Vulnerable to Shor algorithm on elliptic curve discrete log."
+  },
+  {
+    "id": "ed25519",
+    "name": "Ed25519",
+    "aliases": [
+      "edwards25519",
+      "eddsa-25519"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Digital Signature",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "ML-DSA (Dilithium - FIPS 204)",
+      "Hybrid Ed25519 + ML-DSA"
+    ],
+    "detection_patterns": [
+      "ed25519",
+      "crypto/ed25519",
+      "Ed25519PrivateKey",
+      "crypto.generateKeyPair(\"ed25519"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "rust"
+    ],
+    "notes": "High-speed deterministic EdDSA signature scheme over Curve25519. Immune to side-channel and nonce leaks classically, but vulnerable to quantum Shor."
+  },
+  {
+    "id": "ed448",
+    "name": "Ed448",
+    "aliases": [
+      "goldilocks-sig",
+      "eddsa-448"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Digital Signature",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      448
+    ],
+    "recommended_replacement": [
+      "ML-DSA-87 (FIPS 204)"
+    ],
+    "detection_patterns": [
+      "ed448",
+      "Ed448PrivateKey"
+    ],
+    "languages": [
+      "python",
+      "c",
+      "cpp",
+      "go",
+      "rust"
+    ],
+    "notes": "NIST Edwards curve signature scheme providing 224-bit classical security level. Vulnerable to quantum discrete log."
+  },
+  {
+    "id": "schnorr",
+    "name": "Schnorr",
+    "aliases": [
+      "schnorr-signature",
+      "bip340"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Digital Signature",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "ML-DSA (Dilithium)"
+    ],
+    "detection_patterns": [
+      "schnorr",
+      "bip340",
+      "secp256k1_schnorrsig"
+    ],
+    "languages": [
+      "python",
+      "c",
+      "cpp",
+      "rust",
+      "go"
+    ],
+    "notes": "Linear signature scheme used in Bitcoin Taproot. Vulnerable to Shor quantum discrete logarithm."
+  },
+  {
+    "id": "ecgdsa",
+    "name": "ECGDSA",
+    "aliases": [
+      "german elliptic curve dsa"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Digital Signature",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      256,
+      384
+    ],
+    "recommended_replacement": [
+      "ML-DSA (Dilithium)"
+    ],
+    "detection_patterns": [
+      "ecgdsa",
+      "ECGDSA"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "BSI German specification for elliptic curve signatures. Vulnerable to Shor algorithm."
+  },
+  {
+    "id": "rsassa-pss",
+    "name": "RSASSA-PSS",
+    "aliases": [
+      "rsa-pss",
+      "pkcs2-pss"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Digital Signature",
+    "status": "CURRENT",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "SECURE",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      2048,
+      3072,
+      4096
+    ],
+    "recommended_replacement": [
+      "ML-DSA (Dilithium - FIPS 204)"
+    ],
+    "detection_patterns": [
+      "RSASSA-PSS",
+      "crypto.constants.RSA_PKCS1_PSS_PADDING"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "java",
+      "c",
+      "cpp"
+    ],
+    "notes": "PKCS#1 v2.1 signature scheme with probabilistic salt."
+  },
+  {
+    "id": "xmss",
+    "name": "XMSS",
+    "aliases": [
+      "extended merkle signature scheme",
+      "rfc8391"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Stateful Hash-Based Signature",
+    "status": "POST_QUANTUM",
+    "quantum_status": "QUANTUM_SAFE",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "SHA256_10/16/20"
+    ],
+    "recommended_replacement": [
+      "Maintain deployment; strictly manage one-time key state"
+    ],
+    "detection_patterns": [
+      "xmss",
+      "XMSS",
+      "rfc8391"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "rust",
+      "java"
+    ],
+    "notes": "Stateful hash-based signature standardized in RFC 8391 and NIST SP 800-208. Quantum safe; requires strict state backup management to avoid key reuse."
+  },
+  {
+    "id": "lms",
+    "name": "LMS",
+    "aliases": [
+      "leighton-micali signature",
+      "rfc8554",
+      "hss-lms"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Stateful Hash-Based Signature",
+    "status": "POST_QUANTUM",
+    "quantum_status": "QUANTUM_SAFE",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "LMS_SHA256_M32_H10"
+    ],
+    "recommended_replacement": [
+      "Maintain deployment; adhere to NIST SP 800-208 guidance"
+    ],
+    "detection_patterns": [
+      "lms",
+      "LMS_SHA256",
+      "rfc8554",
+      "HSS-LMS"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "rust",
+      "java"
+    ],
+    "notes": "Stateful hash-based signature scheme approved for firmware validation. Quantum safe."
+  },
+  {
+    "id": "ml-dsa",
+    "name": "ML-DSA / Dilithium",
+    "aliases": [
+      "dilithium",
+      "crystals-dilithium",
+      "ml-dsa-44",
+      "ml-dsa-65",
+      "ml-dsa-87"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Module Lattice Signature",
+    "status": "POST_QUANTUM",
+    "quantum_status": "QUANTUM_SAFE",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      44,
+      65,
+      87
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation; follow NIST FIPS 204"
+    ],
+    "detection_patterns": [
+      "ml-dsa",
+      "crystals-dilithium",
+      "dilithium2",
+      "dilithium3",
+      "dilithium5",
+      "MLDSA",
+      "pqcrypto.sign.dilithium"
+    ],
+    "languages": [
+      "python",
+      "rust",
+      "c",
+      "cpp",
+      "go",
+      "java",
+      "typescript"
+    ],
+    "notes": "Primary NIST FIPS 204 post-quantum general-purpose digital signature standard."
+  },
+  {
+    "id": "slh-dsa",
+    "name": "SLH-DSA / SPHINCS+",
+    "aliases": [
+      "sphincs+",
+      "sphincsplus",
+      "slh-dsa-sha2-128s",
+      "slh-dsa-shake-256f"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Stateless Hash-Based Signature",
+    "status": "POST_QUANTUM",
+    "quantum_status": "QUANTUM_SAFE",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "128s/f",
+      "192s/f",
+      "256s/f"
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation; follow NIST FIPS 205"
+    ],
+    "detection_patterns": [
+      "slh-dsa",
+      "sphincs+",
+      "sphincsplus",
+      "SLHDSA",
+      "pqcrypto.sign.sphincs"
+    ],
+    "languages": [
+      "python",
+      "rust",
+      "c",
+      "cpp",
+      "go"
+    ],
+    "notes": "NIST FIPS 205 stateless hash-based signature. Conservative security assumption based solely on hash security."
+  },
+  {
+    "id": "falcon",
+    "name": "Falcon",
+    "aliases": [
+      "falcon-512",
+      "falcon-1024",
+      "fn-dsa"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Lattice-Based Signature",
+    "status": "POST_QUANTUM",
+    "quantum_status": "QUANTUM_SAFE",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      512,
+      1024
+    ],
+    "recommended_replacement": [
+      "NIST draft standard FN-DSA for constrained bandwidth environments"
+    ],
+    "detection_patterns": [
+      "falcon-512",
+      "falcon-1024",
+      "falcon_sign",
+      "pqcrypto.sign.falcon"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "rust",
+      "python"
+    ],
+    "notes": "Lattice signature with extremely compact signature and public key sizes. Requires constant-time floating point arithmetic."
+  },
+  {
+    "id": "rainbow",
+    "name": "Rainbow",
+    "aliases": [
+      "rainbow signature"
+    ],
+    "category": "DIGITAL_SIGNATURES",
+    "type": "Multivariate Signature",
+    "status": "DEPRECATED",
+    "quantum_status": "VULNERABLE_SHOR",
+    "classical_security": "BROKEN",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      "Ia",
+      "IIIc",
+      "Vc"
+    ],
+    "recommended_replacement": [
+      "ML-DSA (Dilithium - FIPS 204)"
+    ],
+    "detection_patterns": [
+      "rainbow_signature",
+      "rainbow-ia",
+      "pqcrypto_rainbow"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "python"
+    ],
+    "notes": "Classically broken by Ward Beullens algebraic intersection attack in 2022; eliminated from NIST standardization."
+  },
+  {
+    "id": "md2",
+    "name": "MD2",
+    "aliases": [
+      "message digest 2"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "DEPRECATED",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "BROKEN",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      128
+    ],
+    "recommended_replacement": [
+      "SHA-256",
+      "SHA-3"
+    ],
+    "detection_patterns": [
+      "md2",
+      "MD2.new",
+      "MessageDigest.getInstance(\"MD2"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java",
+      "python"
+    ],
+    "notes": "RFC 6149 deprecated. Collision and preimage attacks feasible on ordinary hardware."
+  },
+  {
+    "id": "md4",
+    "name": "MD4",
+    "aliases": [
+      "message digest 4"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "DEPRECATED",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "BROKEN",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      128
+    ],
+    "recommended_replacement": [
+      "SHA-256",
+      "SHA-3"
+    ],
+    "detection_patterns": [
+      "md4",
+      "MD4.new",
+      "crypto.createHash(\"md4"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "javascript",
+      "python"
+    ],
+    "notes": "Completely broken classically. Collisions generated in under a second."
+  },
+  {
+    "id": "md5",
+    "name": "MD5",
+    "aliases": [
+      "message digest 5"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "DEPRECATED",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "BROKEN",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      128
+    ],
+    "recommended_replacement": [
+      "SHA-256",
+      "SHA-3-256",
+      "BLAKE3"
+    ],
+    "detection_patterns": [
+      "hashlib.md5",
+      "crypto.createHash(\"md5",
+      "MessageDigest.getInstance(\"MD5",
+      "md5(",
+      "md5_file",
+      "crypto/md5"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "php",
+      "ruby",
+      "rust"
+    ],
+    "notes": "Severe practical collision vulnerabilities (Flame malware, forged certificates). Do NOT use for digital signatures or security verification."
+  },
+  {
+    "id": "sha-0",
+    "name": "SHA-0",
+    "aliases": [
+      "secure hash algorithm 0",
+      "sha"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "DEPRECATED",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "BROKEN",
+    "risk_level": "CRITICAL",
+    "key_sizes": [
+      160
+    ],
+    "recommended_replacement": [
+      "SHA-256",
+      "SHA-3"
+    ],
+    "detection_patterns": [
+      "sha0",
+      "SHA-0"
+    ],
+    "languages": [
+      "c",
+      "cpp"
+    ],
+    "notes": "Withdrawn by NSA in 1995 shortly after publication due to undisclosed flaw."
+  },
+  {
+    "id": "sha-1",
+    "name": "SHA-1",
+    "aliases": [
+      "secure hash algorithm 1",
+      "sha1"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "DEPRECATED",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "BROKEN",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      160
+    ],
+    "recommended_replacement": [
+      "SHA-256",
+      "SHA-512",
+      "SHA-3-256"
+    ],
+    "detection_patterns": [
+      "hashlib.sha1",
+      "crypto.createHash(\"sha1",
+      "MessageDigest.getInstance(\"SHA-1",
+      "sha1(",
+      "crypto/sha1"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "php",
+      "ruby",
+      "rust"
+    ],
+    "notes": "Practical collision attacks demonstrated (SHAttered, Shambles). Prohibited by NIST across federal systems."
+  },
+  {
+    "id": "sha-224",
+    "name": "SHA-224",
+    "aliases": [
+      "sha224"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      224
+    ],
+    "recommended_replacement": [
+      "SHA-256"
+    ],
+    "detection_patterns": [
+      "hashlib.sha224",
+      "crypto.createHash(\"sha224",
+      "MessageDigest.getInstance(\"SHA-224"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "java",
+      "c",
+      "cpp",
+      "go"
+    ],
+    "notes": "Truncated version of SHA-256 offering 112 bits of classical collision resistance."
+  },
+  {
+    "id": "sha-256",
+    "name": "SHA-256",
+    "aliases": [
+      "sha256"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation; consider SHA-384/512 or SHA-3 for length-extension resilience"
+    ],
+    "detection_patterns": [
+      "hashlib.sha256",
+      "crypto.createHash(\"sha256",
+      "MessageDigest.getInstance(\"SHA-256",
+      "crypto/sha256",
+      "EVP_sha256"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "csharp",
+      "php",
+      "ruby",
+      "rust"
+    ],
+    "notes": "Ubiquitous standard. Under Brassard et al. quantum collision analysis, SHA-256 retains ~128 bits of security against quantum collision attacks, satisfying post-quantum needs."
+  },
+  {
+    "id": "sha-384",
+    "name": "SHA-384",
+    "aliases": [
+      "sha384"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      384
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "hashlib.sha384",
+      "crypto.createHash(\"sha384",
+      "MessageDigest.getInstance(\"SHA-384"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "java",
+      "c",
+      "cpp",
+      "go"
+    ],
+    "notes": "Truncated variant of SHA-512. Resists length extension and offers 192 bits of collision resistance."
+  },
+  {
+    "id": "sha-512",
+    "name": "SHA-512",
+    "aliases": [
+      "sha512"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      512
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "hashlib.sha512",
+      "crypto.createHash(\"sha512",
+      "MessageDigest.getInstance(\"SHA-512",
+      "crypto/sha512"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "php",
+      "rust"
+    ],
+    "notes": "High-security 64-bit word architecture hash. Superb performance on 64-bit CPUs; 256 bits collision resistance."
+  },
+  {
+    "id": "sha-512/224",
+    "name": "SHA-512/224",
+    "aliases": [
+      "sha512-224"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      224
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "sha512/224",
+      "sha512_224"
+    ],
+    "languages": [
+      "python",
+      "c",
+      "cpp",
+      "go"
+    ],
+    "notes": "Truncated SHA-512 with distinct initial vector. Naturally immune to length extension."
+  },
+  {
+    "id": "sha-512/256",
+    "name": "SHA-512/256",
+    "aliases": [
+      "sha512-256"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Cryptographic Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "sha512/256",
+      "sha512_256",
+      "crypto/sha512"
+    ],
+    "languages": [
+      "python",
+      "go",
+      "c",
+      "cpp"
+    ],
+    "notes": "Faster than SHA-256 on 64-bit systems while offering immunity to length-extension attacks."
+  },
+  {
+    "id": "sha3-224",
+    "name": "SHA3-224",
+    "aliases": [
+      "sha3_224",
+      "keccak-224"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Sponge Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      224
+    ],
+    "recommended_replacement": [
+      "SHA3-256"
+    ],
+    "detection_patterns": [
+      "sha3-224",
+      "hashlib.sha3_224",
+      "crypto.createHash(\"sha3-224"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "java",
+      "c",
+      "cpp",
+      "go"
+    ],
+    "notes": "Keccak sponge construction (FIPS 202). Radically different mathematical design from SHA-2."
+  },
+  {
+    "id": "sha3-256",
+    "name": "SHA3-256",
+    "aliases": [
+      "sha3_256",
+      "keccak-256"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Sponge Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "sha3-256",
+      "hashlib.sha3_256",
+      "crypto.createHash(\"sha3-256",
+      "MessageDigest.getInstance(\"SHA3-256"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "rust"
+    ],
+    "notes": "NIST FIPS 202 sponge hash function. Immune to length extension by design; robust quantum resistance margin."
+  },
+  {
+    "id": "sha3-384",
+    "name": "SHA3-384",
+    "aliases": [
+      "sha3_384"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Sponge Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      384
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "sha3-384",
+      "hashlib.sha3_384",
+      "crypto.createHash(\"sha3-384"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "java",
+      "c",
+      "cpp",
+      "go"
+    ],
+    "notes": "384-bit Keccak sponge hash."
+  },
+  {
+    "id": "sha3-512",
+    "name": "SHA3-512",
+    "aliases": [
+      "sha3_512"
+    ],
+    "category": "HASH_FUNCTIONS",
+    "type": "Sponge Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      512
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "sha3-512",
+      "hashlib.sha3_512",
+      "crypto.createHash(\"sha3-512"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "java",
+      "c",
+      "cpp",
+      "go",
+      "rust"
+    ],
+    "notes": "Top tier 512-bit Keccak sponge construction offering maximum security margins."
+  },
+  {
+    "id": "shake128",
+    "name": "SHAKE128",
+    "aliases": [
+      "shake-128"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "Extendable-Output Function (XOF)",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "Variable output"
+    ],
+    "recommended_replacement": [
+      "SHAKE256 (for higher quantum security margins)"
+    ],
+    "detection_patterns": [
+      "shake128",
+      "shake_128",
+      "hashlib.shake_128",
+      "crypto.createHash(\"shake128"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "c",
+      "cpp",
+      "go",
+      "rust"
+    ],
+    "notes": "Keccak sponge XOF (FIPS 202). Can generate arbitrary-length digest streams."
+  },
+  {
+    "id": "shake256",
+    "name": "SHAKE256",
+    "aliases": [
+      "shake-256"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "Extendable-Output Function (XOF)",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "Variable output"
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "shake256",
+      "shake_256",
+      "hashlib.shake_256",
+      "crypto.createHash(\"shake256"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "c",
+      "cpp",
+      "go",
+      "rust"
+    ],
+    "notes": "High-security Keccak XOF utilized internally inside NIST post-quantum standards ML-KEM and ML-DSA."
+  },
+  {
+    "id": "blake2b",
+    "name": "BLAKE2b",
+    "aliases": [
+      "blake2-512"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "Cryptographic Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "1-64 bytes"
+    ],
+    "recommended_replacement": [
+      "BLAKE3 (for higher throughput)"
+    ],
+    "detection_patterns": [
+      "blake2b",
+      "hashlib.blake2b",
+      "crypto.createHash(\"blake2b512"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "c",
+      "cpp",
+      "go",
+      "rust"
+    ],
+    "notes": "High-speed 64-bit optimized hash (RFC 7693) faster than SHA-1 and MD5 while maintaining SHA-3 level security."
+  },
+  {
+    "id": "blake2s",
+    "name": "BLAKE2s",
+    "aliases": [
+      "blake2-256"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "Cryptographic Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "1-32 bytes"
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "blake2s",
+      "hashlib.blake2s",
+      "crypto.createHash(\"blake2s256"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "c",
+      "cpp",
+      "go",
+      "rust"
+    ],
+    "notes": "32-bit optimized BLAKE2 variant designed for microcontrollers and embedded architectures."
+  },
+  {
+    "id": "blake3",
+    "name": "BLAKE3",
+    "aliases": [
+      "b3"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "Cryptographic Tree Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation"
+    ],
+    "detection_patterns": [
+      "blake3",
+      "blake3::Hasher",
+      "blake3.blake3"
+    ],
+    "languages": [
+      "rust",
+      "c",
+      "cpp",
+      "python",
+      "go"
+    ],
+    "notes": "Tree-based cryptographic hash with unlimited parallelism and extreme performance across SIMD instruction sets."
+  },
+  {
+    "id": "ripemd-160",
+    "name": "RIPEMD-160",
+    "aliases": [
+      "rmd160"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "Cryptographic Hash",
+    "status": "LEGACY",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "MEDIUM",
+    "key_sizes": [
+      160
+    ],
+    "recommended_replacement": [
+      "SHA-256",
+      "SHA-3-256"
+    ],
+    "detection_patterns": [
+      "ripemd160",
+      "hashlib.new(\"ripemd160",
+      "crypto.createHash(\"ripemd160"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "c",
+      "cpp",
+      "go"
+    ],
+    "notes": "160-bit European hash function notably utilized in Bitcoin address derivation. 80-bit collision bound."
+  },
+  {
+    "id": "whirlpool",
+    "name": "Whirlpool",
+    "aliases": [
+      "whirlpool-hash"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "Cryptographic Hash",
+    "status": "LEGACY",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      512
+    ],
+    "recommended_replacement": [
+      "SHA-512",
+      "SHA-3-512"
+    ],
+    "detection_patterns": [
+      "whirlpool",
+      "crypto.createHash(\"whirlpool"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "javascript",
+      "python",
+      "java"
+    ],
+    "notes": "512-bit hash based on Miyaguchi-Preneel construction with a dedicated AES-like block cipher (NESSIE recommendation)."
+  },
+  {
+    "id": "hmac",
+    "name": "HMAC",
+    "aliases": [
+      "hash-based message authentication code",
+      "hmac-sha256",
+      "hmac-sha512",
+      "hmac-md5",
+      "hmac-sha1"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "Message Authentication Code",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "Variable (>= hash block size)"
+    ],
+    "recommended_replacement": [
+      "HMAC-SHA256 / HMAC-SHA512 (avoid HMAC-MD5 and HMAC-SHA1)"
+    ],
+    "detection_patterns": [
+      "crypto.createHmac",
+      "hmac.new",
+      "Mac.getInstance(\"Hmac",
+      "crypto/hmac",
+      "HMAC_Init"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "php",
+      "ruby",
+      "rust"
+    ],
+    "notes": "RFC 2104 authenticated MAC. Post-quantum security depends on underlying hash and key length (HMAC-SHA256 provides strong quantum PRF margin)."
+  },
+  {
+    "id": "cmac",
+    "name": "CMAC",
+    "aliases": [
+      "cipher-based mac",
+      "omac1"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "Message Authentication Code",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      128,
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation (with AES-256 block cipher)"
+    ],
+    "detection_patterns": [
+      "CMAC",
+      "AES-CMAC",
+      "CMAC_Init"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java",
+      "python"
+    ],
+    "notes": "NIST SP 800-38B cipher-based MAC. When backed by AES-256, provides quantum-safe authentication."
+  },
+  {
+    "id": "poly1305",
+    "name": "Poly1305",
+    "aliases": [
+      "poly1305-mac"
+    ],
+    "category": "HASH_XOF_MAC",
+    "type": "One-Time Authenticator",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain implementation (ensure unique one-time key per message)"
+    ],
+    "detection_patterns": [
+      "poly1305",
+      "Poly1305",
+      "crypto.createCipheriv(\"chacha20-poly1305"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "rust",
+      "go",
+      "javascript",
+      "python"
+    ],
+    "notes": "Information-theoretically secure universal hash MAC when used with unique single-use one-time keys."
+  },
+  {
+    "id": "aes-gcm",
+    "name": "AES-GCM",
+    "aliases": [
+      "aes-128-gcm",
+      "aes-256-gcm",
+      "galois/counter mode"
+    ],
+    "category": "AEAD",
+    "type": "Authenticated Encryption",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      128,
+      256
+    ],
+    "recommended_replacement": [
+      "Prefer AES-256-GCM for 128-bit post-quantum security margin"
+    ],
+    "detection_patterns": [
+      "aes-256-gcm",
+      "aes-128-gcm",
+      "AES/GCM/NoPadding",
+      "AES.MODE_GCM",
+      "GCMBlockCipher",
+      "crypto.createCipheriv(\"aes-256-gcm"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "rust",
+      "csharp",
+      "php"
+    ],
+    "notes": "Industry standard AEAD. AES-256-GCM is fully quantum safe against Grover attack with 128-bit margin. Crucial: strictly avoid nonce reuse."
+  },
+  {
+    "id": "aes-ccm",
+    "name": "AES-CCM",
+    "aliases": [
+      "aes-128-ccm",
+      "aes-256-ccm",
+      "counter with cbc-mac"
+    ],
+    "category": "AEAD",
+    "type": "Authenticated Encryption",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      128,
+      256
+    ],
+    "recommended_replacement": [
+      "Prefer AES-256-CCM or AES-GCM"
+    ],
+    "detection_patterns": [
+      "aes-256-ccm",
+      "aes-128-ccm",
+      "AES/CCM/NoPadding",
+      "AES.MODE_CCM"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java",
+      "python"
+    ],
+    "notes": "NIST SP 800-38C AEAD common in IoT (Zigbee, WPA2/WPA3)."
+  },
+  {
+    "id": "aes-eax",
+    "name": "AES-EAX",
+    "aliases": [
+      "aes-eax-mode"
+    ],
+    "category": "AEAD",
+    "type": "Authenticated Encryption",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      128,
+      256
+    ],
+    "recommended_replacement": [
+      "AES-256-GCM"
+    ],
+    "detection_patterns": [
+      "AES.MODE_EAX",
+      "EAXBlockCipher",
+      "aes-eax"
+    ],
+    "languages": [
+      "python",
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "Two-pass AEAD invented by Bellare, Rogaway, and Wagner. Robust against nonce reuse for plaintext leakage."
+  },
+  {
+    "id": "aes-siv",
+    "name": "AES-SIV",
+    "aliases": [
+      "synthetic initialization vector",
+      "rfc5297"
+    ],
+    "category": "AEAD",
+    "type": "Deterministic Authenticated Encryption",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256,
+      512
+    ],
+    "recommended_replacement": [
+      "AES-GCM-SIV (RFC 8452) for higher performance"
+    ],
+    "detection_patterns": [
+      "AES.MODE_SIV",
+      "AES-SIV",
+      "rfc5297"
+    ],
+    "languages": [
+      "python",
+      "java",
+      "go",
+      "c",
+      "cpp"
+    ],
+    "notes": "Nonce-misuse resistant AEAD scheme. If nonce repeats, attacker only learns if plaintexts were identical."
+  },
+  {
+    "id": "chacha20-poly1305",
+    "name": "ChaCha20-Poly1305",
+    "aliases": [
+      "chacha20_poly1305",
+      "rfc8439"
+    ],
+    "category": "AEAD",
+    "type": "Authenticated Encryption",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation; highly recommended for systems without AES hardware acceleration"
+    ],
+    "detection_patterns": [
+      "chacha20-poly1305",
+      "ChaCha20Poly1305",
+      "crypto.createCipheriv(\"chacha20-poly1305",
+      "ChaCha20_Poly1305.new",
+      "crypto/cipher.NewChaCha20Poly1305"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "go",
+      "c",
+      "cpp",
+      "rust",
+      "java"
+    ],
+    "notes": "RFC 8439 modern AEAD standard. 256-bit key yields 128-bit quantum security; exceptional speed on ARM/mobile devices."
+  },
+  {
+    "id": "xchacha20-poly1305",
+    "name": "XChaCha20-Poly1305",
+    "aliases": [
+      "xchacha20_poly1305",
+      "extended-nonce chacha20"
+    ],
+    "category": "AEAD",
+    "type": "Authenticated Encryption",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      256
+    ],
+    "recommended_replacement": [
+      "Maintain implementation; optimal for random nonce generation scenarios"
+    ],
+    "detection_patterns": [
+      "xchacha20-poly1305",
+      "XChaCha20Poly1305",
+      "crypto_aead_xchacha20poly1305_ietf"
+    ],
+    "languages": [
+      "rust",
+      "go",
+      "c",
+      "cpp",
+      "python"
+    ],
+    "notes": "192-bit extended nonce prevents collision risks under random nonce selection. Quantum-resistant."
+  },
+  {
+    "id": "aes-gcm-siv",
+    "name": "AES-GCM-SIV",
+    "aliases": [
+      "rfc8452"
+    ],
+    "category": "AEAD",
+    "type": "Nonce-Misuse Resistant AEAD",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      128,
+      256
+    ],
+    "recommended_replacement": [
+      "Prefer 256-bit variant for post-quantum safety margin"
+    ],
+    "detection_patterns": [
+      "aes-gcm-siv",
+      "AES-GCM-SIV",
+      "aes_gcm_siv"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "rust",
+      "go"
+    ],
+    "notes": "RFC 8452 nonce-misuse resistant AEAD that achieves near AES-GCM speeds with hardware acceleration."
+  },
+  {
+    "id": "ascon-128",
+    "name": "Ascon-128",
+    "aliases": [
+      "ascon-a",
+      "ascon-128a"
+    ],
+    "category": "AEAD",
+    "type": "Lightweight AEAD",
+    "status": "POST_QUANTUM",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      128
+    ],
+    "recommended_replacement": [
+      "NIST Lightweight Cryptography standard choice"
+    ],
+    "detection_patterns": [
+      "ascon-128",
+      "ascon_128",
+      "ascon"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "rust",
+      "python"
+    ],
+    "notes": "Winner of the NIST Lightweight Cryptography competition (2023). Sponge-based AEAD designed for resource-constrained embedded systems."
+  },
+  {
+    "id": "pbkdf2",
+    "name": "PBKDF2",
+    "aliases": [
+      "pbkdf2_hmac",
+      "pkcs5"
+    ],
+    "category": "PASSWORD_HASHING_KDF",
+    "type": "Key Derivation Function",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "MEDIUM",
+    "key_sizes": [
+      "Configurable output"
+    ],
+    "recommended_replacement": [
+      "Argon2id for password hashing; HKDF for key expansion"
+    ],
+    "detection_patterns": [
+      "pbkdf2",
+      "crypto.pbkdf2",
+      "hashlib.pbkdf2_hmac",
+      "SecretKeyFactory.getInstance(\"PBKDF2"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "c",
+      "cpp",
+      "php",
+      "ruby",
+      "rust"
+    ],
+    "notes": "RFC 2898 / NIST SP 800-132. GPU/ASIC acceleration vulnerabilities due to lack of memory hardness. Requires high iteration count (e.g. >= 600,000 for SHA-256)."
+  },
+  {
+    "id": "bcrypt",
+    "name": "bcrypt",
+    "aliases": [
+      "blowfish-crypt"
+    ],
+    "category": "PASSWORD_HASHING_KDF",
+    "type": "Password Hashing Function",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "72 bytes password limit"
+    ],
+    "recommended_replacement": [
+      "Argon2id (modern memory-hard alternative)"
+    ],
+    "detection_patterns": [
+      "bcrypt.hash",
+      "bcrypt.hashSync",
+      "bcrypt.generate_password_hash",
+      "bcrypt_hash",
+      "golang.org/x/crypto/bcrypt"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "java",
+      "go",
+      "ruby",
+      "php",
+      "rust"
+    ],
+    "notes": "Memory-bound password hash based on Eksblowfish. Classically resilient, but limited to 72-byte password length."
+  },
+  {
+    "id": "scrypt",
+    "name": "scrypt",
+    "aliases": [
+      "scrypt-kdf"
+    ],
+    "category": "PASSWORD_HASHING_KDF",
+    "type": "Memory-Hard KDF",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "Configurable output"
+    ],
+    "recommended_replacement": [
+      "Argon2id"
+    ],
+    "detection_patterns": [
+      "crypto.scrypt",
+      "hashlib.scrypt",
+      "scrypt.hash",
+      "golang.org/x/crypto/scrypt"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "go",
+      "c",
+      "cpp",
+      "rust"
+    ],
+    "notes": "RFC 7914 memory-hard key derivation function specifically designed to impede custom hardware and ASIC attacks."
+  },
+  {
+    "id": "argon2",
+    "name": "Argon2",
+    "aliases": [
+      "argon2id",
+      "argon2i",
+      "argon2d"
+    ],
+    "category": "PASSWORD_HASHING_KDF",
+    "type": "Memory-Hard Password Hash",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "Variable output"
+    ],
+    "recommended_replacement": [
+      "Maintain current implementation (prefer Argon2id variant)"
+    ],
+    "detection_patterns": [
+      "argon2",
+      "argon2id",
+      "argon2.PasswordHasher",
+      "argon2.hash",
+      "golang.org/x/crypto/argon2"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "go",
+      "c",
+      "cpp",
+      "rust",
+      "php"
+    ],
+    "notes": "Winner of the Password Hashing Competition (RFC 9106). Current gold standard for password storage and key derivation."
+  },
+  {
+    "id": "hkdf",
+    "name": "HKDF",
+    "aliases": [
+      "hmac-kdf",
+      "rfc5869"
+    ],
+    "category": "PASSWORD_HASHING_KDF",
+    "type": "Key Derivation Function",
+    "status": "CURRENT",
+    "quantum_status": "QUANTUM_RESISTANT",
+    "classical_security": "SECURE",
+    "risk_level": "LOW",
+    "key_sizes": [
+      "Variable output"
+    ],
+    "recommended_replacement": [
+      "Maintain implementation (ensure adequate entropy input)"
+    ],
+    "detection_patterns": [
+      "hkdf",
+      "crypto.hkdf",
+      "HKDF.new",
+      "golang.org/x/crypto/hkdf"
+    ],
+    "languages": [
+      "python",
+      "javascript",
+      "typescript",
+      "go",
+      "c",
+      "cpp",
+      "rust"
+    ],
+    "notes": "HMAC-based Extract-and-Expand Key Derivation Function (RFC 5869). Standard in TLS 1.3 and WireGuard."
+  },
+  {
+    "id": "kdf1",
+    "name": "KDF1",
+    "aliases": [
+      "iso-18033-2-kdf1"
+    ],
+    "category": "PASSWORD_HASHING_KDF",
+    "type": "Key Derivation Function",
+    "status": "LEGACY",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "WEAK",
+    "risk_level": "HIGH",
+    "key_sizes": [
+      "Variable output"
+    ],
+    "recommended_replacement": [
+      "HKDF (RFC 5869)"
+    ],
+    "detection_patterns": [
+      "kdf1",
+      "KDF1"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "Early IEEE P1363 / ISO 18033-2 hash-based KDF without proper extraction step."
+  },
+  {
+    "id": "kdf2",
+    "name": "KDF2",
+    "aliases": [
+      "iso-18033-2-kdf2"
+    ],
+    "category": "PASSWORD_HASHING_KDF",
+    "type": "Key Derivation Function",
+    "status": "LEGACY",
+    "quantum_status": "PARTIALLY_VULNERABLE_GROVER",
+    "classical_security": "ACCEPTABLE",
+    "risk_level": "MEDIUM",
+    "key_sizes": [
+      "Variable output"
+    ],
+    "recommended_replacement": [
+      "HKDF (RFC 5869)"
+    ],
+    "detection_patterns": [
+      "kdf2",
+      "KDF2"
+    ],
+    "languages": [
+      "c",
+      "cpp",
+      "java"
+    ],
+    "notes": "Counter-based hash KDF defined in ISO 18033-2. Superseded by HKDF."
+  }
+]

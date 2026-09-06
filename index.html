@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRYPTOVISTA — Enterprise Cryptographic Discovery, Risk & Post-Quantum Migration Analysis</title>
+    <meta name="description" content="Enterprise Cryptographic Discovery, Risk & Post-Quantum Migration Analysis. Discover. Assess. Prioritize. Prepare." />
+    <meta property="og:title" content="CRYPTOVISTA — Enterprise Cryptographic Discovery, Risk & Post-Quantum Migration Analysis" />
+    <meta property="og:description" content="Enterprise Cryptographic Discovery, Risk & Post-Quantum Migration Analysis. Discover. Assess. Prioritize. Prepare." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      (function() {
+        try {
+          var s = localStorage.getItem('cryptovista_settings');
+          var theme = s ? JSON.parse(s).theme : 'dark';
+          if (theme === 'light') {
+            document.documentElement.classList.remove('dark');
+          } else {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
