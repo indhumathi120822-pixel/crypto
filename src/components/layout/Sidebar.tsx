@@ -2,7 +2,9 @@ import React from 'react';
 import {
   LayoutDashboard,
   UploadCloud,
+  History,
   FileSearch,
+  Layers,
   Code2,
   FileSpreadsheet,
   Atom,
@@ -37,11 +39,25 @@ export const Sidebar: React.FC = () => {
       badgeColor: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
     },
     {
+      id: 'history',
+      label: 'Scan History & Compare',
+      icon: History,
+      badge: 'Audit',
+      badgeColor: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30',
+    },
+    {
       id: 'findings',
       label: 'Findings Explorer',
       icon: FileSearch,
       badge: scanned ? findings.length : undefined,
       badgeColor: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30',
+    },
+    {
+      id: 'matrix',
+      label: 'Vision 1 vs 2 (PQC Matrix)',
+      icon: Layers,
+      badge: scanned ? 'PQC' : undefined,
+      badgeColor: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
     },
     {
       id: 'developer',

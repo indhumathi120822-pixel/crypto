@@ -36,9 +36,13 @@ export const RiskBadge: React.FC<{ level: RiskLevel; score?: number; size?: 'sm'
       colorClasses = 'bg-yellow-950/35 text-yellow-300 border border-yellow-700/60 dark:bg-[#38310c] dark:text-yellow-200 dark:border-yellow-800/80';
       break;
     case 'LOW':
-    default:
       // Calm green
       colorClasses = 'bg-emerald-950/35 text-emerald-300 border border-emerald-800/60 dark:bg-[#0c311e] dark:text-emerald-200 dark:border-emerald-800/80';
+      break;
+    case 'MINIMAL':
+    default:
+      // Neutral slate / low-activity blue
+      colorClasses = 'bg-slate-800/40 text-slate-300 border border-slate-700/60 dark:bg-slate-900/60 dark:text-slate-300 dark:border-slate-800';
       break;
   }
 

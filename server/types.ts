@@ -7,13 +7,59 @@ export type CategoryType =
   | 'AEAD'
   | 'PASSWORD_HASHING_KDF';
 
+export type CryptographicPurpose =
+  | 'ENCRYPTION'
+  | 'DIGITAL_SIGNATURE'
+  | 'KEY_EXCHANGE_KEM'
+  | 'HASHING'
+  | 'MAC'
+  | 'PASSWORD_HASHING'
+  | 'AUTHENTICATION'
+  | 'TRANSPORT_SECURITY'
+  | 'UNKNOWN';
+
 export type AlgorithmStatus = 'CURRENT' | 'LEGACY' | 'DEPRECATED' | 'POST_QUANTUM';
 export type QuantumStatus = 'VULNERABLE_SHOR' | 'PARTIALLY_VULNERABLE_GROVER' | 'QUANTUM_RESISTANT' | 'QUANTUM_SAFE';
 export type ClassicalSecurity = 'SECURE' | 'ACCEPTABLE' | 'WEAK' | 'BROKEN';
-export type RiskLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+export type RiskLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'MINIMAL';
+export type RiskCategory = 'Quantum Vulnerability' | 'Classical Weakness' | 'Migration Risk';
 export type PriorityLevel = 'P1' | 'P2' | 'P3' | 'P4';
 export type BusinessCriticality = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type DetectionType = 'ACTIVE_USAGE' | 'LIBRARY_USAGE' | 'CONFIGURATION_USAGE' | 'TEXTUAL_REFERENCE' | 'UNKNOWN';
+
+export interface WhyRiskLevel {
+  vulnerableAlgorithm: string;
+  keySize: string;
+  cryptographicPurpose: string;
+  internetExposure: string;
+  dataSensitivity: string;
+  expectedDataLifetime: string;
+  migrationComplexity: string;
+}
+
+export interface RiskThresholds {
+  minimal: number; // default 20 (0 - 20)
+  low: number; // default 40 (21 - 40)
+  medium: number; // default 60 (41 - 60)
+  high: number; // default 80 (61 - 80)
+}
+
+export interface Vision1State {
+  algorithm: string;
+  riskLevel: RiskLevel;
+  purpose: string;
+  quantumThreat: string;
+  status: AlgorithmStatus;
+}
+
+export interface Vision2State {
+  targetAlgorithm: string;
+  standard: string;
+  targetRiskLevel: RiskLevel;
+  migrationComplexity: 'LOW' | 'MEDIUM' | 'HIGH';
+  recommendedTimeline: string;
+  rationale: string;
+}
 
 export interface CryptoAlgorithmDef {
   id: string;
@@ -68,13 +114,29 @@ export interface Finding {
   confidence: number;
   evidence: string;
   context: string;
+  detectedArtefact: string;
+  cryptographicPurpose: CryptographicPurpose;
+  keySize: number | string | null;
+  library: string;
+  protocol: string;
+  ruleMatched: string;
+  reason: string;
+  explanationFactors: string[];
+  vision1: Vision1State;
+  vision2: Vision2State;
+  isRedacted?: boolean;
   businessCriticality: BusinessCriticality;
   dataLifetime: number; // in years, default 5
   migrationTime: number; // in years, default 2
   threatHorizon: number; // in years, default 10
   riskScore: number; // 0 - 100
   riskLevel: RiskLevel;
+  riskCategory: RiskCategory;
   priority: PriorityLevel;
+  priorityReason?: string;
+  whyRiskLevel: WhyRiskLevel;
+  internetFacing?: boolean;
+  isInsufficientInfo?: boolean;
   quantumRelevanceScore: number;
   algorithmConcernScore: number;
   businessCriticalityScore: number;
@@ -147,6 +209,7 @@ export interface ScanStats {
   highRisks: number;
   mediumRisks: number;
   lowRisks: number;
+  minimalRisks: number;
   p1Candidates: number;
   p2Candidates: number;
   p3Candidates: number;
@@ -163,6 +226,7 @@ export interface ScanStats {
     high: number;
     medium: number;
     low: number;
+    minimal: number;
   };
   quantumBreakdown?: {
     vulnerableShor: number;
@@ -175,6 +239,7 @@ export interface ScanStats {
     high: number;
     medium: number;
     low: number;
+    minimal?: number;
   };
 }
 
@@ -188,7 +253,9 @@ export interface RiskWeights {
 
 export interface ScanSession {
   id: string;
+  userId?: string;
   repoName: string;
+  repoUrl?: string;
   uploadedAt: string;
   fileCount: number;
   totalSizeBytes: number;
@@ -204,3 +271,96 @@ export interface ScanSession {
   defaultMigrationTime: number;
   threatHorizon: number;
 }
+
+export interface StoredScanSummary {
+  id: string;
+  userId?: string;
+  repoName: string;
+  repoUrl?: string;
+  uploadedAt: string;
+  fileCount: number;
+  totalFindings: number;
+  averageRiskScore: number;
+  overallQuantumPosture: string;
+  criticalRisks: number;
+  highRisks: number;
+  mediumRisks: number;
+  lowRisks: number;
+  p1Candidates: number;
+  p2Candidates: number;
+  p3Candidates: number;
+  p4Candidates: number;
+}
+
+export interface ScanComparisonResult {
+  oldScanId: string;
+  newScanId: string;
+  oldRepoName: string;
+  newRepoName: string;
+  oldDate: string;
+  newDate: string;
+  oldRiskScore: number;
+  newRiskScore: number;
+  riskReduction: number;
+  riskReductionPercent: number;
+  oldTotalFindings: number;
+  newTotalFindings: number;
+  newFindings: Finding[];
+  resolvedFindings: Finding[];
+  unchangedFindingsCount: number;
+  migrationProgress: {
+    migratedToPqcCount: number;
+    pendingP1Count: number;
+    progressPercent: number;
+  };
+}
+
+export interface UserAlgorithm {
+  id: string;
+  userId: string;
+  algorithmName: string;
+  algorithmType: string;
+  keySize: string;
+  cryptographicPurpose: CryptographicPurpose;
+  usage: string;
+  environment: string;
+  dataSensitivity: BusinessCriticality;
+  internetFacing: boolean;
+  lifetimeYears: number;
+  component: string;
+  notes?: string;
+  category: CategoryType;
+  quantumStatus: QuantumStatus;
+  classicalSecurity: ClassicalSecurity;
+  riskScore: number;
+  riskLevel: RiskLevel;
+  riskCategory: RiskCategory;
+  priority: PriorityLevel;
+  priorityReason: string;
+  whyRiskLevel: WhyRiskLevel;
+  isInsufficientInfo?: boolean;
+  pqcRecommendation: {
+    targetAlgorithm: string;
+    standard: string;
+    targetRiskLevel: RiskLevel;
+    migrationComplexity: 'LOW' | 'MEDIUM' | 'HIGH';
+    rationale: string;
+  };
+  createdAt: string;
+}
+
+export interface AlgorithmAnalysisRequest {
+  algorithmName: string;
+  algorithmType?: string;
+  keySize?: string | number;
+  cryptographicPurpose?: CryptographicPurpose | string;
+  usage?: string;
+  environment?: string;
+  dataSensitivity?: BusinessCriticality;
+  internetFacing?: boolean;
+  lifetimeYears?: number;
+  component?: string;
+  notes?: string;
+  userId?: string;
+}
+

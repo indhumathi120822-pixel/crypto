@@ -4,6 +4,7 @@ import { Finding, PriorityLevel, RiskLevel, QuantumStatus, CategoryType, Detecti
 import { RiskBadge, QuantumBadge, PriorityBadge, DetectionBadge } from '../components/common/Badge';
 import { EmptyState } from '../components/common/EmptyState';
 import { FindingDetailModal } from '../components/findings/FindingDetailModal';
+import { AddAlgorithmModal } from '../components/inventory/AddAlgorithmModal';
 import {
   Search,
   Filter,
@@ -18,6 +19,7 @@ import {
   Clock,
   ShieldCheck,
   Zap,
+  Plus,
 } from 'lucide-react';
 
 export const FindingsPage: React.FC = () => {
@@ -32,31 +34,52 @@ export const FindingsPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<'risk' | 'priority' | 'line' | 'name'>('risk');
 
   const [inspectingFinding, setInspectingFinding] = useState<Finding | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  if (!scanned) {
+  if (!scanned && findings.length === 0) {
     return (
-      <div className="py-6">
+      <div className="py-6 space-y-4">
         <EmptyState
           title="No Findings Discovered Yet"
-          description="Upload a ZIP archive containing source code or configuration files to scan and generate cryptographic findings."
+          description="Upload a repository or register cryptographic algorithms manually to assess and generate findings."
           onNavigateScan={() => setActivePage('scan')}
           onNavigateKnowledgeBase={() => setActivePage('knowledge-base')}
           viewContext="findings"
         />
+        <div className="flex justify-center">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-sm cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            Manually Register Cryptographic Asset
+          </button>
+        </div>
+        <AddAlgorithmModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
       </div>
     );
   }
 
   if (findings.length === 0) {
     return (
-      <div className="py-6">
+      <div className="py-6 space-y-4">
         <EmptyState
           title="No Cryptographic Artefacts Detected"
-          description="No cryptographic artefacts were detected in the uploaded repository."
+          description="No cryptographic artefacts were detected in the uploaded repository. You can manually register cryptographic algorithms."
           onNavigateScan={() => setActivePage('scan')}
           onNavigateKnowledgeBase={() => setActivePage('knowledge-base')}
           viewContext="findings"
         />
+        <div className="flex justify-center">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-sm cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            Manually Register Cryptographic Asset
+          </button>
+        </div>
+        <AddAlgorithmModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
       </div>
     );
   }
@@ -113,6 +136,13 @@ export const FindingsPage: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Register Algorithm
+          </button>
+          <button
             onClick={() => setActivePage('cbom')}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
@@ -120,7 +150,7 @@ export const FindingsPage: React.FC = () => {
           </button>
           <button
             onClick={() => setActivePage('developer')}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <Code2 className="w-3.5 h-3.5" />
             Open Code Editor
@@ -442,6 +472,12 @@ export const FindingsPage: React.FC = () => {
           onClose={() => setInspectingFinding(null)}
         />
       )}
+
+      {/* Manual Algorithm Registration Modal */}
+      <AddAlgorithmModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>
   );
 };

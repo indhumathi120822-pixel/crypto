@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { EmptyState } from '../components/common/EmptyState';
+import { AddAlgorithmModal } from '../components/inventory/AddAlgorithmModal';
 import { PriorityLevel, QuantumStatus } from '../types';
 import {
   FileSpreadsheet,
@@ -19,6 +20,7 @@ import {
   Atom,
   SlidersHorizontal,
   X,
+  Plus,
 } from 'lucide-react';
 import {
   QuantumBadge,
@@ -35,6 +37,7 @@ export const CbomPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPriority, setFilterPriority] = useState<PriorityLevel | 'ALL'>('ALL');
   const [filterQuantum, setFilterQuantum] = useState<QuantumStatus | 'ALL'>('ALL');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   if (!scanned) {
     return (
@@ -105,12 +108,20 @@ export const CbomPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Download Buttons */}
+        {/* Download & Register Buttons */}
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Register Algorithm
+          </button>
+
           <a
             href={api.getCbomUrl('json')}
             download
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer border border-slate-700/50"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors shadow-xs cursor-pointer border border-slate-700/50"
           >
             <Download className="w-3.5 h-3.5" />
             Export CycloneDX JSON
@@ -482,6 +493,12 @@ export const CbomPage: React.FC = () => {
           </pre>
         </div>
       )}
+
+      {/* Manual Algorithm Registration Modal */}
+      <AddAlgorithmModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>
   );
 };

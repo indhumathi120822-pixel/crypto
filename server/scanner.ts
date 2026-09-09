@@ -12,27 +12,243 @@ import {
   DetectionType,
   BusinessCriticality,
   RiskWeights,
+  CryptographicPurpose,
+  CategoryType,
 } from './types.js';
 import { getKnowledgeBase } from './knowledgeBase.js';
-import { calculateFindingRisk, DEFAULT_RISK_WEIGHTS } from './riskEngine.js';
+import { calculateFindingRisk, DEFAULT_RISK_WEIGHTS, generateVisionStates } from './riskEngine.js';
 import { generateRecommendation } from './recommendations.js';
 
 const SCANNABLE_EXTENSIONS = new Set([
   '.py', '.js', '.jsx', '.ts', '.tsx', '.java', '.go',
   '.c', '.cpp', '.h', '.hpp', '.cs', '.php', '.rb', '.rs',
   '.kt', '.swift', '.yaml', '.yml', '.json', '.xml',
-  '.conf', '.config', '.properties', '.env', 'dockerfile'
+  '.conf', '.config', '.properties', '.env', '.env.example', 'dockerfile',
+  '.sql', '.pem', '.crt', '.cer', '.key', '.pfx', '.p12',
+  '.tf', '.toml', '.gradle'
 ]);
 
 const MANIFEST_NAMES = new Set([
   'package.json', 'requirements.txt', 'pom.xml',
-  'build.gradle', 'go.mod', 'cargo.toml', 'gemfile'
+  'build.gradle', 'go.mod', 'cargo.toml', 'gemfile', 'dockerfile'
 ]);
 
 const IGNORED_DIRS = new Set([
   '.git', 'node_modules', '__pycache__', '.idea', '.vscode',
   'dist', 'build', 'target', 'bin', 'obj', '.venv', 'vendor'
 ]);
+
+export function redactSensitiveText(text: string): { text: string; redacted: boolean } {
+  let redacted = false;
+  let result = text;
+
+  // AWS Access Key ID & Generic API Keys
+  if (
+    /AKIA[0-9A-Z]{16}/.test(result) ||
+    /AIza[0-9A-Za-z-_]{35}/.test(result) ||
+    /ghp_[0-9A-Za-z]{36}/.test(result) ||
+    /sk_live_[0-9a-zA-Z]{24,}/.test(result)
+  ) {
+    result = result
+      .replace(/AKIA[0-9A-Z]{16}/g, '[REDACTED SECRET]')
+      .replace(/AIza[0-9A-Za-z-_]{35}/g, '[REDACTED SECRET]')
+      .replace(/ghp_[0-9A-Za-z]{36}/g, '[REDACTED SECRET]')
+      .replace(/sk_live_[0-9a-zA-Z]{24,}/g, '[REDACTED SECRET]');
+    redacted = true;
+  }
+
+  // Private Key Blocks
+  if (/-----BEGIN (?:[A-Z0-9_-]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9_-]+ )?PRIVATE KEY-----/g.test(result)) {
+    result = result.replace(
+      /-----BEGIN (?:[A-Z0-9_-]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9_-]+ )?PRIVATE KEY-----/g,
+      '-----BEGIN PRIVATE KEY-----\n[REDACTED SECRET]\n-----END PRIVATE KEY-----'
+    );
+    redacted = true;
+  }
+
+  // JWT Tokens (header.payload.signature)
+  if (/eyJ[a-zA-Z0-9_-]{10,}\.eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]+/g.test(result)) {
+    result = result.replace(
+      /eyJ[a-zA-Z0-9_-]{10,}\.eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]+/g,
+      '[REDACTED SECRET]'
+    );
+    redacted = true;
+  }
+
+  // Passwords, secrets, and API tokens
+  const secretPattern = /(password|passwd|secret|api_key|apikey|auth_token|client_secret|private_key|db_password)\s*[:=]\s*(['"][^'"]{4,}['"]|[^\s,;]+)/gi;
+  if (secretPattern.test(result)) {
+    result = result.replace(secretPattern, (match, prefix) => {
+      redacted = true;
+      return `${prefix} = "[REDACTED SECRET]"`;
+    });
+  }
+
+  // Database Connection strings with credentials
+  if (/(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?):\/\/[^:]+:[^@]+@/gi.test(result)) {
+    result = result.replace(/(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?):\/\/[^:]+:[^@]+@/gi, (match) => {
+      const proto = match.split('://')[0];
+      return `${proto}://[REDACTED SECRET]@`;
+    });
+    redacted = true;
+  }
+
+  // Bearer tokens
+  if (/Bearer\s+[a-zA-Z0-9._-]{20,}/gi.test(result)) {
+    result = result.replace(/Bearer\s+[a-zA-Z0-9._-]{20,}/gi, 'Bearer [REDACTED SECRET]');
+    redacted = true;
+  }
+
+  return { text: result, redacted };
+}
+
+export function isInternetFacingFile(filePath: string, line: string): boolean {
+  const p = filePath.toLowerCase();
+  const l = line.toLowerCase();
+  return (
+    p.includes('api') ||
+    p.includes('route') ||
+    p.includes('controller') ||
+    p.includes('server') ||
+    p.includes('gateway') ||
+    p.includes('endpoint') ||
+    p.includes('public') ||
+    p.includes('tls') ||
+    p.includes('ssl') ||
+    p.includes('web') ||
+    l.includes('listen(') ||
+    l.includes('0.0.0.0') ||
+    l.includes('express') ||
+    l.includes('app.get') ||
+    l.includes('app.post') ||
+    l.includes('cors') ||
+    l.includes('fetch(') ||
+    l.includes('http')
+  );
+}
+
+export function inferCryptographicPurpose(
+  line: string,
+  algoName: string,
+  category: CategoryType
+): CryptographicPurpose {
+  const l = line.toLowerCase();
+  if (l.includes('sign') || l.includes('verify') || l.includes('signature') || category === 'DIGITAL_SIGNATURES') {
+    return 'DIGITAL_SIGNATURE';
+  }
+  if (
+    category === 'ASYMMETRIC_KEY_EXCHANGE' ||
+    l.includes('ecdh') ||
+    l.includes('diffie_hellman') ||
+    l.includes('key_exchange') ||
+    l.includes('exchange') ||
+    l.includes('kem')
+  ) {
+    return 'KEY_EXCHANGE_KEM';
+  }
+  if (l.includes('tls') || l.includes('ssl') || l.includes('https') || l.includes('transport')) {
+    return 'TRANSPORT_SECURITY';
+  }
+  if (l.includes('jwt') || l.includes('token') || l.includes('auth') || l.includes('bearer')) {
+    return 'AUTHENTICATION';
+  }
+  if (l.includes('password') || l.includes('bcrypt') || l.includes('argon2') || l.includes('pbkdf') || category === 'PASSWORD_HASHING_KDF') {
+    return 'PASSWORD_HASHING';
+  }
+  if (category === 'HASH_XOF_MAC' || l.includes('hmac') || l.includes('mac')) {
+    return 'MAC';
+  }
+  if (category === 'HASH_FUNCTIONS' || l.includes('sha') || l.includes('hash') || l.includes('digest')) {
+    return 'HASHING';
+  }
+  if (category === 'SYMMETRIC_ENCRYPTION' || category === 'AEAD' || l.includes('encrypt') || l.includes('cipher')) {
+    return 'ENCRYPTION';
+  }
+  return 'ENCRYPTION';
+}
+
+export function inferKeySize(
+  line: string,
+  algoName: string,
+  defaultKeySizes: (number | string)[] = []
+): number | string | null {
+  const l = line.toLowerCase();
+  // Check for explicit key size in code e.g. 2048, 4096, 256, 128, 512
+  const matchExplicit = line.match(/\b(512|1024|2048|3072|4096|128|192|256|384)\b/);
+  if (matchExplicit) {
+    return parseInt(matchExplicit[1], 10);
+  }
+  // Check algorithm name itself
+  const matchName = algoName.match(/(?:-|_)(\d{2,4})\b/);
+  if (matchName) {
+    return parseInt(matchName[1], 10);
+  }
+  if (defaultKeySizes.length > 0) {
+    return defaultKeySizes[0];
+  }
+  return null;
+}
+
+export function inferLibrary(line: string, fileExt: string, imports: Set<string>): string {
+  const l = line.toLowerCase();
+  if (imports.has('openssl') || l.includes('openssl')) return 'OpenSSL';
+  if (imports.has('crypto') || l.includes('node:crypto') || l.includes('crypto.')) return 'Node.js crypto';
+  if (imports.has('hashlib') || l.includes('hashlib')) return 'Python hashlib';
+  if (l.includes('cryptography')) return 'Python cryptography';
+  if (l.includes('pycryptodome')) return 'PyCryptodome';
+  if (l.includes('bouncycastle')) return 'BouncyCastle';
+  if (l.includes('subtlecrypto') || l.includes('window.crypto')) return 'WebCrypto API';
+  if (l.includes('java.security') || l.includes('javax.crypto')) return 'Java Cryptography Architecture (JCA)';
+  if (imports.has('jwt') || l.includes('jsonwebtoken')) return 'jsonwebtoken';
+  if (imports.has('bcrypt') || l.includes('bcrypt')) return 'bcrypt';
+  if (fileExt === '.go') return 'Go crypto standard library';
+  if (fileExt === '.rs') return 'Rust crypto crate';
+  return 'Standard Cryptographic Library';
+}
+
+export function inferProtocol(line: string, algoName: string): string {
+  const l = line.toLowerCase();
+  if (l.includes('tls 1.3') || l.includes('tls1.3') || l.includes('tlsv1.3')) return 'TLS 1.3';
+  if (l.includes('tls 1.2') || l.includes('tls1.2') || l.includes('tlsv1.2')) return 'TLS 1.2';
+  if (l.includes('tls 1.0') || l.includes('tls 1.1') || l.includes('ssl')) return 'Legacy TLS / SSL';
+  if (l.includes('https')) return 'HTTPS Transport';
+  if (l.includes('ssh')) return 'SSH Protocol';
+  if (l.includes('jwt')) return 'JSON Web Token (JWT)';
+  if (l.includes('ipsec')) return 'IPsec VPN';
+  return 'Application Layer';
+}
+
+export function inferDetectedArtefact(
+  algoName: string,
+  purpose: CryptographicPurpose,
+  keySize: number | string | null,
+  file: string
+): string {
+  const ext = path.extname(file).toLowerCase();
+  if (ext === '.pem' || ext === '.crt' || ext === '.cer' || ext === '.key') {
+    return `X.509 Certificate / Public-Private Key Material (${algoName})`;
+  }
+  const sizeStr = keySize ? ` [${keySize}-bit]` : '';
+  switch (purpose) {
+    case 'DIGITAL_SIGNATURE':
+      return `${algoName}${sizeStr} Digital Signature Primitive`;
+    case 'KEY_EXCHANGE_KEM':
+      return `${algoName}${sizeStr} Asymmetric Key Exchange / KEM`;
+    case 'TRANSPORT_SECURITY':
+      return `${algoName} Transport Security Cipher Suite`;
+    case 'AUTHENTICATION':
+      return `${algoName} Authentication / Token Signing Spec`;
+    case 'PASSWORD_HASHING':
+      return `${algoName} Password Hashing Function`;
+    case 'MAC':
+      return `${algoName} Message Authentication Code (MAC)`;
+    case 'HASHING':
+      return `${algoName} Cryptographic Hash Function`;
+    case 'ENCRYPTION':
+    default:
+      return `${algoName}${sizeStr} Symmetric Encryption Cipher`;
+  }
+}
 
 interface ExtractedFile {
   relativePath: string;
@@ -307,12 +523,56 @@ export function scanRepository(
       ) {
         blindSpotsCount++;
         const surrounding = getSurroundingCode(lines, lineNum);
+        const redacted = redactSensitiveText(rawLine);
+        const purpose: CryptographicPurpose = 'TRANSPORT_SECURITY';
+        const keySize = null;
+        const library = inferLibrary(rawLine, ext, importsInFile);
+        const protocol = inferProtocol(rawLine, 'TLS');
+        const detectedArtefact = 'Unspecified Dynamic TLS / Cipher Suite (Requires Runtime Inspection)';
+
+        const isInternetFacing = isInternetFacingFile(file.relativePath, rawLine);
+        const {
+          riskScore: bsRiskScore,
+          riskLevel: bsRiskLevel,
+          riskCategory: bsRiskCategory,
+          priority: bsPriority,
+          priorityReason: bsPriorityReason,
+          whyRiskLevel: bsWhyRiskLevel,
+          isInsufficientInfo: bsIsInsufficientInfo,
+          quantumRelevanceScore: bsQScore,
+          algorithmConcernScore: bsAScore,
+          businessCriticalityScore: bsBScore,
+          dataLifetimeScore: bsLScore,
+          migrationEffortScore: bsMScore,
+          moscaAnalysis: bsMosca,
+          explanationFactors: bsExplanation,
+          ruleMatched: bsRuleMatched,
+          reason: bsReason,
+          vision1,
+          vision2,
+        } = calculateFindingRisk(
+          {
+            algorithmName: 'Unknown Cryptographic Asset',
+            quantumStatus: 'VULNERABLE_SHOR',
+            classicalSecurity: 'ACCEPTABLE',
+            businessCriticality: defCrit,
+            dataLifetime: defLife,
+            migrationTime: defMig,
+            threatHorizon,
+            category: 'SYMMETRIC_ENCRYPTION',
+            purpose,
+            confidence: 42,
+            internetFacing: isInternetFacing,
+          },
+          weights
+        );
+
         const blindSpotFinding: Finding = {
           id: `blind-spot-${findings.length + 1}`,
           file: file.relativePath,
           line: lineNum,
           column: rawLine.indexOf(trimmed) + 1,
-          code: rawLine,
+          code: redacted.text,
           surroundingCode: surrounding,
           algorithmId: 'unknown-crypto-asset',
           algorithmName: 'Unknown Cryptographic Asset',
@@ -325,25 +585,35 @@ export function scanRepository(
           confidence: 42,
           evidence: 'Cryptographic mechanism detected without static algorithm specification (dynamic negotiation or runtime configuration).',
           context: `Line ${lineNum} in ${file.relativePath}`,
+          detectedArtefact,
+          cryptographicPurpose: purpose,
+          keySize,
+          library,
+          protocol,
+          ruleMatched: bsRuleMatched,
+          reason: bsReason,
+          explanationFactors: bsExplanation,
+          vision1,
+          vision2,
+          isRedacted: redacted.redacted,
           businessCriticality: defCrit,
           dataLifetime: defLife,
           migrationTime: defMig,
           threatHorizon,
-          riskScore: 50,
-          riskLevel: 'MEDIUM',
-          priority: 'P3',
-          quantumRelevanceScore: 60,
-          algorithmConcernScore: 40,
-          businessCriticalityScore: 50,
-          dataLifetimeScore: 50,
-          migrationEffortScore: 50,
-          moscaAnalysis: {
-            deficitYears: 0,
-            isUrgent: false,
-            urgencyText: 'Further inspection recommended. Dynamic cipher negotiation requires runtime telemetry.',
-            safetyMarginYears: 3,
-            disclaimer: 'This is a planning and risk-assessment model inspired by the Mosca framework.',
-          },
+          riskScore: bsRiskScore,
+          riskLevel: bsRiskLevel,
+          riskCategory: bsRiskCategory,
+          priority: bsPriority,
+          priorityReason: bsPriorityReason,
+          whyRiskLevel: bsWhyRiskLevel,
+          isInsufficientInfo: bsIsInsufficientInfo,
+          internetFacing: isInternetFacing,
+          quantumRelevanceScore: bsQScore,
+          algorithmConcernScore: bsAScore,
+          businessCriticalityScore: bsBScore,
+          dataLifetimeScore: bsLScore,
+          migrationEffortScore: bsMScore,
+          moscaAnalysis: bsMosca,
           recommendation: 'Evaluate pinning explicit post-quantum or high-assurance cipher suites in transport configurations.',
           remediation: {
             problem: 'Cryptographic primitive invoked via dynamic negotiation or unknown variable.',
@@ -391,18 +661,36 @@ export function scanRepository(
         }
 
         const surrounding = getSurroundingCode(lines, lineNum);
+        const redacted = redactSensitiveText(rawLine);
+        const purpose = inferCryptographicPurpose(rawLine, algo.name, algo.category);
+        const keySize = inferKeySize(rawLine, algo.name, algo.key_sizes);
+        const library = inferLibrary(rawLine, ext, importsInFile);
+        const protocol = inferProtocol(rawLine, algo.name);
+        const detectedArtefact = inferDetectedArtefact(algo.name, purpose, keySize, file.relativePath);
+
+        const isInternetFacing = isInternetFacingFile(file.relativePath, rawLine);
         const {
           riskScore,
           riskLevel,
+          riskCategory,
           priority,
+          priorityReason,
+          whyRiskLevel,
+          isInsufficientInfo,
           quantumRelevanceScore,
           algorithmConcernScore,
           businessCriticalityScore,
           dataLifetimeScore,
           migrationEffortScore,
           moscaAnalysis,
+          explanationFactors,
+          ruleMatched,
+          reason,
+          vision1,
+          vision2,
         } = calculateFindingRisk(
           {
+            algorithmName: algo.name,
             quantumStatus: algo.quantum_status,
             classicalSecurity: algo.classical_security,
             businessCriticality: defCrit,
@@ -410,7 +698,10 @@ export function scanRepository(
             migrationTime: defMig,
             threatHorizon,
             category: algo.category,
+            purpose,
             confidence: matchResult.confidence,
+            keySize,
+            internetFacing: isInternetFacing,
           },
           weights
         );
@@ -426,7 +717,7 @@ export function scanRepository(
           file: file.relativePath,
           line: lineNum,
           column: rawLine.indexOf(trimmed) + 1,
-          code: rawLine,
+          code: redacted.text,
           surroundingCode: surrounding,
           algorithmId: algo.id,
           algorithmName: algo.name,
@@ -439,13 +730,29 @@ export function scanRepository(
           confidence: matchResult.confidence,
           evidence: matchResult.evidence,
           context: `${algo.name} detected in ${file.relativePath}:${lineNum}`,
+          detectedArtefact,
+          cryptographicPurpose: purpose,
+          keySize,
+          library,
+          protocol,
+          ruleMatched,
+          reason,
+          explanationFactors,
+          vision1,
+          vision2,
+          isRedacted: redacted.redacted,
           businessCriticality: defCrit,
           dataLifetime: defLife,
           migrationTime: defMig,
           threatHorizon,
           riskScore,
           riskLevel,
+          riskCategory,
           priority,
+          priorityReason,
+          whyRiskLevel,
+          isInsufficientInfo,
+          internetFacing: isInternetFacing,
           quantumRelevanceScore,
           algorithmConcernScore,
           businessCriticalityScore,
@@ -534,7 +841,26 @@ export function scanRepository(
   // Calculate dependency graph
   const dependencyGraph = buildDependencyGraph(files, findings);
 
-  // Statistics calculation
+  const stats = calculateStatsFromFindings(findings, files.length, scannedFilesCount, cryptoAgility, blindSpotsCount);
+
+  return { findings, stats, fileTree, dependencyGraph };
+}
+
+export function calculateStatsFromFindings(
+  findings: Finding[],
+  totalFiles: number = 1,
+  scannedFilesCount: number = 1,
+  cryptoAgility: ScanStats['cryptoAgility'] = {
+    score: 70,
+    rating: 'MODERATE',
+    hardcodedAlgorithmsCount: 0,
+    centralizedConfigDetected: true,
+    abstractionDetected: true,
+    findings: [],
+    summary: 'Crypto agility is moderate based on available cryptographic abstractions.',
+  },
+  blindSpotsCount: number = 0
+): ScanStats {
   const totalFindings = findings.length;
   const quantumRelevantFindings = findings.filter(
     (f) => f.quantumStatus === 'VULNERABLE_SHOR' || f.quantumStatus === 'PARTIALLY_VULNERABLE_GROVER'
@@ -543,6 +869,7 @@ export function scanRepository(
   const highRisks = findings.filter((f) => f.riskLevel === 'HIGH').length;
   const mediumRisks = findings.filter((f) => f.riskLevel === 'MEDIUM').length;
   const lowRisks = findings.filter((f) => f.riskLevel === 'LOW').length;
+  const minimalRisks = findings.filter((f) => f.riskLevel === 'MINIMAL').length;
   const p1Candidates = findings.filter((f) => f.priority === 'P1').length;
   const p2Candidates = findings.filter((f) => f.priority === 'P2').length;
   const p3Candidates = findings.filter((f) => f.priority === 'P3').length;
@@ -572,8 +899,8 @@ export function scanRepository(
     quantumStatusDistribution[f.quantumStatus] = (quantumStatusDistribution[f.quantumStatus] || 0) + 1;
   }
 
-  const stats: ScanStats = {
-    totalFiles: files.length,
+  return {
+    totalFiles,
     scannedFiles: scannedFilesCount,
     totalFindings,
     quantumRelevantFindings,
@@ -581,6 +908,7 @@ export function scanRepository(
     highRisks,
     mediumRisks,
     lowRisks,
+    minimalRisks,
     p1Candidates,
     p2Candidates,
     p3Candidates,
@@ -597,6 +925,7 @@ export function scanRepository(
       high: highRisks,
       medium: mediumRisks,
       low: lowRisks,
+      minimal: minimalRisks,
     },
     quantumBreakdown: {
       vulnerableShor: quantumStatusDistribution['VULNERABLE_SHOR'] || 0,
@@ -609,10 +938,9 @@ export function scanRepository(
       high: highRisks,
       medium: mediumRisks,
       low: lowRisks,
+      minimal: minimalRisks,
     },
   };
-
-  return { findings, stats, fileTree, dependencyGraph };
 }
 
 function getSurroundingCode(lines: string[], targetLineNum: number, span: number = 5) {
@@ -621,9 +949,11 @@ function getSurroundingCode(lines: string[], targetLineNum: number, span: number
   const end = Math.min(lines.length, targetLineNum + span);
 
   for (let l = start; l <= end; l++) {
+    const raw = lines[l - 1];
+    const redacted = redactSensitiveText(raw);
     result.push({
       lineNumber: l,
-      content: lines[l - 1],
+      content: redacted.text,
       isTarget: l === targetLineNum,
     });
   }

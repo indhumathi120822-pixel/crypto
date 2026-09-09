@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -13,9 +13,13 @@ import {
   Activity,
   CheckCircle2,
   Zap,
+  Plus,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { RiskBadge, QuantumBadge, PriorityBadge } from '../common/Badge';
+import { QuantumRiskRing } from './QuantumRiskRing';
+import { AddAlgorithmModal } from '../inventory/AddAlgorithmModal';
+import { RiskLevel, RiskCategory, PriorityLevel } from '../../types';
 import {
   ResponsiveContainer,
   BarChart,
@@ -30,6 +34,7 @@ import {
 
 export const CisoDashboard: React.FC = () => {
   const { stats, findings, repoName, setActivePage, openFindingInCode, settings } = useApp();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   if (!stats) return null;
 
@@ -80,6 +85,32 @@ export const CisoDashboard: React.FC = () => {
   const topAlgos = Object.entries(stats.algorithmDistribution)
     .sort((a, b) => Number(b[1]) - Number(a[1]))
     .slice(0, 5);
+
+  // Determine overall risk level and category
+  const getOverallRiskLevel = (avgScore: number): RiskLevel => {
+    if (avgScore >= 81 || stats.criticalRisks > 0) return 'CRITICAL';
+    if (avgScore >= 61 || stats.highRisks > 0) return 'HIGH';
+    if (avgScore >= 41 || stats.mediumRisks > 0) return 'MEDIUM';
+    if (avgScore >= 21 || stats.lowRisks > 0) return 'LOW';
+    return 'MINIMAL';
+  };
+
+  const overallRiskLevel = getOverallRiskLevel(stats.averageRiskScore);
+
+  const overallRiskCategory: RiskCategory = shorFindings.length > 0
+    ? 'Quantum Vulnerability'
+    : brokenFindings.length > 0
+    ? 'Classical Weakness'
+    : 'Migration Risk';
+
+  const overallPriority: PriorityLevel = p1Count > 0 ? 'P1' : p2Count > 0 ? 'P2' : p3Count > 0 ? 'P3' : 'P4';
+  const overallPriorityReason = p1Count > 0
+    ? `${p1Count} urgent cryptographic asset(s) identified requiring immediate architectural remediation (Shor-vulnerable PKI or Mosca planning horizon deficit).`
+    : p2Count > 0
+    ? `${p2Count} high-priority asset(s) scheduled for migration to post-quantum standards.`
+    : p3Count > 0
+    ? `${p3Count} medium-priority planned migration asset(s) mapped on multi-year roadmap.`
+    : 'Cryptographic inventory is within manageable risk thresholds; continuous monitoring recommended.';
 
   return (
     <div className="space-y-6">
@@ -136,8 +167,16 @@ export const CisoDashboard: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-2 lg:flex-col lg:items-end shrink-0">
             <button
-              onClick={() => setActivePage('cbom')}
+              onClick={() => setIsAddModalOpen(true)}
               className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Register Algorithm
+            </button>
+
+            <button
+              onClick={() => setActivePage('cbom')}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-xs cursor-pointer"
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
               Export CBOM (CycloneDX)
@@ -153,6 +192,19 @@ export const CisoDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Quantum Risk Ring & Explanatory Breakdown Component */}
+      <QuantumRiskRing
+        score={stats.averageRiskScore}
+        level={overallRiskLevel}
+        category={overallRiskCategory}
+        priority={overallPriority}
+        priorityReason={overallPriorityReason}
+        findings={findings}
+        onSelectFinding={(f) => {
+          openFindingInCode(f);
+        }}
+      />
 
       {/* Zero Findings Notice */}
       {findings.length === 0 && (
@@ -514,6 +566,12 @@ export const CisoDashboard: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Manual Algorithm Registration Modal */}
+      <AddAlgorithmModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>
   );
 };

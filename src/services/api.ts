@@ -231,7 +231,7 @@ export const api = {
     return res.json();
   },
 
-  async simulateMigration(findingId: string, targetAlgorithmId: string): Promise<SimulatedResult> {
+  async simulateFindingMigration(findingId: string, targetAlgorithmId: string): Promise<SimulatedResult> {
     const res = await fetch('/api/scan/simulate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -252,5 +252,184 @@ export const api = {
 
   getCbomUrl(format: 'json' | 'csv'): string {
     return `/api/scan/cbom?format=${format}`;
+  },
+
+  async listScans(query?: string): Promise<{ scans: import('../types').StoredScanSummary[]; count: number }> {
+    const q = query ? `?q=${encodeURIComponent(query)}` : '';
+    const res = await fetch(`/api/scans${q}`);
+    if (!res.ok) throw new Error('Failed to list past scans');
+    return res.json();
+  },
+
+  async getScan(id: string): Promise<any> {
+    const res = await fetch(`/api/scans/${encodeURIComponent(id)}`);
+    if (!res.ok) throw new Error(`Failed to load scan ${id}`);
+    return res.json();
+  },
+
+  async loadScan(id: string): Promise<any> {
+    const res = await fetch(`/api/scans/${encodeURIComponent(id)}/load`, { method: 'POST' });
+    if (!res.ok) throw new Error(`Failed to activate scan ${id}`);
+    return res.json();
+  },
+
+  async deleteScan(id: string): Promise<void> {
+    const res = await fetch(`/api/scans/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`Failed to delete scan ${id}`);
+  },
+
+  async compareScans(oldScanId: string, newScanId: string): Promise<import('../types').ScanComparisonResult> {
+    const res = await fetch('/api/scans/compare', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ oldScanId, newScanId }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Comparison failed' }));
+      throw new Error(err.error || 'Failed to compare scans');
+    }
+    return res.json();
+  },
+
+  async validateRepoUrl(url: string): Promise<{
+    valid: boolean;
+    provider?: string | null;
+    owner?: string;
+    repo?: string;
+    error?: string;
+  }> {
+    const res = await fetch('/api/scan/validate-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+    return res.json();
+  },
+
+  async scanRemoteRepo(params: {
+    url: string;
+    branch?: string;
+    weights?: RiskWeights;
+    defaultBusinessCriticality?: BusinessCriticality;
+    defaultDataLifetime?: number;
+    defaultMigrationTime?: number;
+    threatHorizon?: number;
+    confidenceThreshold?: number;
+  }): Promise<{
+    success: boolean;
+    repoName: string;
+    repoUrl?: string;
+    uploadedAt: string;
+    fileCount: number;
+    findings: Finding[];
+    stats: ScanStats;
+    fileTree: FileTreeNode[];
+    dependencyGraph: any;
+  }> {
+    const res = await fetch('/api/scan/remote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Remote scan failed' }));
+      throw new Error(err.error || 'Failed to scan remote repository');
+    }
+    return res.json();
+  },
+
+  async evaluateAlgorithm(params: {
+    algorithmName: string;
+    algorithmFamily: string;
+    keySize?: string | number;
+    purpose?: string;
+    dataSensitivity: string;
+    expectedShelfLife: number;
+    migrationTime: number;
+    internetExposure: boolean | string;
+  }): Promise<{
+    success: boolean;
+    finding: Finding;
+    riskScore: number;
+    riskLevel: string;
+    priority: string;
+    priorityReason: string;
+    riskCategory: string;
+    whyRiskLevel: any;
+    recommendedTarget: string;
+    moscaAnalysis: any;
+  }> {
+    const res = await fetch('/api/algorithms/evaluate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Evaluation failed' }));
+      throw new Error(err.error || 'Failed to evaluate algorithm');
+    }
+    return res.json();
+  },
+
+  async addManualAlgorithm(params: {
+    algorithmName: string;
+    algorithmFamily: string;
+    keySize?: string | number;
+    purpose?: string;
+    dataSensitivity: string;
+    expectedShelfLife: number;
+    migrationTime: number;
+    internetExposure: boolean | string;
+  }): Promise<{
+    success: boolean;
+    finding: Finding;
+    stats: ScanStats;
+    totalFindings: number;
+  }> {
+    const res = await fetch('/api/algorithms/add-to-inventory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to add algorithm' }));
+      throw new Error(err.error || 'Failed to add algorithm to inventory');
+    }
+    return res.json();
+  },
+
+  async simulateMigration(params: {
+    currentAlgorithm: string;
+    targetAlgorithm: string;
+    keySize?: number;
+  }): Promise<{
+    success: boolean;
+    currentAlgorithm: string;
+    targetAlgorithm: string;
+    beforeRiskScore: number;
+    afterRiskScore: number;
+    riskReduction: number;
+    strengthBefore: string;
+    strengthAfter: string;
+    performanceImpact: {
+      keySizeChange: string;
+      ciphertextChange: string;
+      latencyImpact: string;
+    };
+    complexity: 'LOW' | 'MEDIUM' | 'HIGH';
+    complexityReason: string;
+    rationale: string;
+  }> {
+    const res = await fetch('/api/migration/simulate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Simulation failed' }));
+      throw new Error(err.error || 'Failed to simulate migration');
+    }
+    return res.json();
   },
 };

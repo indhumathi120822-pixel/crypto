@@ -13,7 +13,9 @@ import { api } from '../services/api';
 export type PageId =
   | 'dashboard'
   | 'scan'
+  | 'history'
   | 'findings'
+  | 'matrix'
   | 'developer'
   | 'cbom'
   | 'quantum'

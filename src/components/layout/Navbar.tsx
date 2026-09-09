@@ -1,8 +1,10 @@
 import React from 'react';
-import { ShieldCheck, Moon, Sun, Laptop, Trash2, UploadCloud, Eye, Terminal } from 'lucide-react';
+import { ShieldCheck, Moon, Sun, Laptop, Trash2, UploadCloud, Eye, Terminal, LogOut, User as UserIcon } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 
 export const Navbar: React.FC = () => {
+  const { user, logout } = useAuth();
   const {
     scanned,
     repoName,
@@ -159,6 +161,29 @@ export const Navbar: React.FC = () => {
             <Moon className="w-4 h-4" />
           </button>
         </div>
+
+        {/* User Profile & Logout */}
+        {user && (
+          <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-slate-800">
+            <div className="hidden xl:flex flex-col text-right">
+              <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 max-w-[150px] truncate">
+                {user.displayName || user.email?.split('@')[0] || 'Security Officer'}
+              </span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 max-w-[150px] truncate">
+                {user.email}
+              </span>
+            </div>
+            <button
+              id="btn-navbar-logout"
+              onClick={logout}
+              title="Sign Out of Workspace"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );

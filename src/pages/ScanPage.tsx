@@ -9,11 +9,11 @@ import {
   SlidersHorizontal,
   ChevronDown,
   ChevronUp,
-  ShieldCheck,
   ArrowRight,
   RefreshCw,
-  Clock,
-  Layers,
+  GitBranch,
+  Globe,
+  FolderGit2,
 } from 'lucide-react';
 import { BusinessCriticality, RiskWeights } from '../types';
 
@@ -23,14 +23,30 @@ export const ScanPage: React.FC = () => {
     repoName,
     fileCount,
     findings,
-    stats,
     applyUpdatedScanResult,
     setActivePage,
     settings,
   } = useApp();
 
+  // Scan Mode: 'zip' or 'remote'
+  const [scanMode, setScanMode] = useState<'zip' | 'remote'>('zip');
+
+  // ZIP Scan State
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  // Remote Git Scan State
+  const [remoteUrl, setRemoteUrl] = useState<string>('');
+  const [remoteBranch, setRemoteBranch] = useState<string>('');
+  const [urlValidation, setUrlValidation] = useState<{
+    valid: boolean;
+    provider?: string | null;
+    owner?: string;
+    repo?: string;
+    error?: string;
+  } | null>(null);
+
+  // General Scan State
   const [isScanning, setIsScanning] = useState(false);
   const [scanStep, setScanStep] = useState<string>('');
   const [scanStepIndex, setScanStepIndex] = useState<number>(0);
@@ -97,69 +113,121 @@ export const ScanPage: React.FC = () => {
     }
   };
 
+  const handleRemoteUrlChange = async (val: string) => {
+    setRemoteUrl(val);
+    if (!val.trim()) {
+      setUrlValidation(null);
+      return;
+    }
+    if (val.includes('github.com') || val.includes('gitlab.com') || val.includes('bitbucket.org')) {
+      const res = await api.validateRepoUrl(val.trim());
+      setUrlValidation(res);
+    } else {
+      setUrlValidation({
+        valid: false,
+        error: 'Only public repositories on github.com, gitlab.com, or bitbucket.org are supported.',
+      });
+    }
+  };
+
   const startScan = async () => {
-    if (!selectedFile) return;
+    if (scanMode === 'zip' && !selectedFile) return;
+    if (scanMode === 'remote' && (!remoteUrl || (urlValidation && !urlValidation.valid))) {
+      setErrorMessage('Please enter a valid public GitHub, GitLab, or Bitbucket repository URL.');
+      return;
+    }
 
     setIsScanning(true);
     setErrorMessage(null);
     setScanStepIndex(0);
     setScanProgress(10);
-    setScanStep('Uploading repository archive to backend API...');
+    setScanStep(
+      scanMode === 'zip'
+        ? 'Uploading repository archive to backend API...'
+        : 'Connecting to remote Git host and downloading archive securely...'
+    );
 
-    // Progress sequencing through the 9 stages
     const timers: NodeJS.Timeout[] = [];
 
-    timers.push(setTimeout(() => {
-      setScanStepIndex(1);
-      setScanProgress(25);
-      setScanStep('Extracting safely: verifying path traversal & zip bomb constraints...');
-    }, 250));
+    timers.push(
+      setTimeout(() => {
+        setScanStepIndex(1);
+        setScanProgress(25);
+        setScanStep('Extracting safely: verifying path traversal & zip bomb constraints...');
+      }, 350)
+    );
 
-    timers.push(setTimeout(() => {
-      setScanStepIndex(2);
-      setScanProgress(40);
-      setScanStep('Scanning source files and configuration manifests...');
-    }, 550));
+    timers.push(
+      setTimeout(() => {
+        setScanStepIndex(2);
+        setScanProgress(40);
+        setScanStep('Scanning source files and configuration manifests...');
+      }, 700)
+    );
 
-    timers.push(setTimeout(() => {
-      setScanStepIndex(3);
-      setScanProgress(55);
-      setScanStep('Classifying cryptographic primitives against 90 reference definitions...');
-    }, 850));
+    timers.push(
+      setTimeout(() => {
+        setScanStepIndex(3);
+        setScanProgress(55);
+        setScanStep('Classifying cryptographic primitives against 90 reference definitions...');
+      }, 1050)
+    );
 
-    timers.push(setTimeout(() => {
-      setScanStepIndex(4);
-      setScanProgress(70);
-      setScanStep('Context Analysis: isolating active invocations vs. symbol references...');
-    }, 1150));
+    timers.push(
+      setTimeout(() => {
+        setScanStepIndex(4);
+        setScanProgress(70);
+        setScanStep('Context Analysis: isolating active invocations vs. symbol references...');
+      }, 1400)
+    );
 
-    timers.push(setTimeout(() => {
-      setScanStepIndex(5);
-      setScanProgress(80);
-      setScanStep('Risk Analysis: calculating 5-factor risk scores and Mosca horizons...');
-    }, 1450));
+    timers.push(
+      setTimeout(() => {
+        setScanStepIndex(5);
+        setScanProgress(80);
+        setScanStep('Risk Analysis: calculating 5-factor risk scores and Mosca horizons...');
+      }, 1750)
+    );
 
-    timers.push(setTimeout(() => {
-      setScanStepIndex(6);
-      setScanProgress(90);
-      setScanStep('Recommendation Analysis: generating NIST PQC and hybrid migration paths...');
-    }, 1750));
+    timers.push(
+      setTimeout(() => {
+        setScanStepIndex(6);
+        setScanProgress(90);
+        setScanStep('Recommendation Analysis: generating NIST PQC and hybrid migration paths...');
+      }, 2100)
+    );
 
-    timers.push(setTimeout(() => {
-      setScanStepIndex(7);
-      setScanProgress(95);
-      setScanStep('CBOM Generation: building CycloneDX 1.6 Cryptographic Bill of Materials...');
-    }, 2050));
+    timers.push(
+      setTimeout(() => {
+        setScanStepIndex(7);
+        setScanProgress(95);
+        setScanStep('CBOM Generation: building CycloneDX 1.6 Cryptographic Bill of Materials...');
+      }, 2450)
+    );
 
     try {
-      const result = await api.uploadZip(selectedFile, {
-        weights,
-        defaultBusinessCriticality: businessCriticality,
-        defaultDataLifetime: dataLifetime,
-        defaultMigrationTime: migrationTime,
-        threatHorizon,
-        confidenceThreshold,
-      });
+      let result;
+      if (scanMode === 'zip' && selectedFile) {
+        result = await api.uploadZip(selectedFile, {
+          weights,
+          defaultBusinessCriticality: businessCriticality,
+          defaultDataLifetime: dataLifetime,
+          defaultMigrationTime: migrationTime,
+          threatHorizon,
+          confidenceThreshold,
+        });
+      } else {
+        result = await api.scanRemoteRepo({
+          url: remoteUrl.trim(),
+          branch: remoteBranch.trim() || undefined,
+          weights,
+          defaultBusinessCriticality: businessCriticality,
+          defaultDataLifetime: dataLifetime,
+          defaultMigrationTime: migrationTime,
+          threatHorizon,
+          confidenceThreshold,
+        });
+      }
 
       timers.forEach(clearTimeout);
       setScanStepIndex(8);
@@ -173,7 +241,7 @@ export const ScanPage: React.FC = () => {
     } catch (err: any) {
       timers.forEach(clearTimeout);
       setIsScanning(false);
-      setErrorMessage(err.message || 'Scan failed. Please verify the ZIP format.');
+      setErrorMessage(err.message || 'Scan failed. Please verify the repository format.');
     }
   };
 
@@ -181,11 +249,37 @@ export const ScanPage: React.FC = () => {
     <div className="max-w-4xl mx-auto py-6 space-y-6">
       <div>
         <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100">
-          Scan Repository Archive
+          Cryptographic Discovery &amp; Repository Scanner
         </h1>
         <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Upload an enterprise source code repository (ZIP) to discover cryptographic assets, detect quantum vulnerabilities, and produce a CycloneDX CBOM.
+          Analyze enterprise source code repositories to discover cryptographic assets, quantify quantum vulnerability, and construct a CycloneDX CBOM.
         </p>
+      </div>
+
+      {/* Mode Selector Tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800">
+        <button
+          onClick={() => setScanMode('zip')}
+          className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 cursor-pointer transition-colors ${
+            scanMode === 'zip'
+              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+          }`}
+        >
+          <UploadCloud className="w-4 h-4" />
+          Upload ZIP Archive
+        </button>
+        <button
+          onClick={() => setScanMode('remote')}
+          className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 border-b-2 cursor-pointer transition-colors ${
+            scanMode === 'remote'
+              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+          }`}
+        >
+          <FolderGit2 className="w-4 h-4" />
+          Remote Git Repository (GitHub / GitLab)
+        </button>
       </div>
 
       {/* Active Scan Notice */}
@@ -222,58 +316,120 @@ export const ScanPage: React.FC = () => {
         </div>
       )}
 
-      {/* Dropzone */}
-      <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-        className={`border-2 border-dashed rounded-2xl p-8 md:p-12 text-center transition-all cursor-pointer ${
-          isDragging
-            ? 'border-indigo-500 bg-indigo-500/10 scale-[1.005]'
-            : selectedFile
-            ? 'border-emerald-500/50 bg-emerald-500/5 dark:bg-emerald-950/20'
-            : 'border-slate-300 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 hover:border-slate-400 dark:hover:border-slate-700'
-        }`}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".zip"
-          onChange={(e) => {
-            if (e.target.files && e.target.files[0]) {
-              handleFileSelect(e.target.files[0]);
-            }
-          }}
-          className="hidden"
-        />
+      {/* ZIP Mode Dropzone */}
+      {scanMode === 'zip' ? (
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed rounded-2xl p-8 md:p-12 text-center transition-all cursor-pointer ${
+            isDragging
+              ? 'border-indigo-500 bg-indigo-500/10 scale-[1.005]'
+              : selectedFile
+              ? 'border-emerald-500/50 bg-emerald-500/5 dark:bg-emerald-950/20'
+              : 'border-slate-300 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 hover:border-slate-400 dark:hover:border-slate-700'
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".zip"
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                handleFileSelect(e.target.files[0]);
+              }
+            }}
+            className="hidden"
+          />
 
-        <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mx-auto mb-4">
-          <UploadCloud className="w-8 h-8" />
+          <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mx-auto mb-4">
+            <UploadCloud className="w-8 h-8" />
+          </div>
+
+          {selectedFile ? (
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-2">
+                <FileArchive className="w-4 h-4" />
+                <span>{selectedFile.name}</span>
+                <span className="opacity-80">({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Ready to scan. Click below to initiate discovery analysis, or select a different archive.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <div className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-200 mb-1">
+                Drag &amp; drop repository .ZIP here, or click to browse
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                Supports codebases in Python, JavaScript/TypeScript, Java, Go, C/C++, Rust, C#, PHP, Ruby, and configuration files. Maximum size: {settings.maxUploadSizeMb} MB.
+              </p>
+            </div>
+          )}
         </div>
+      ) : (
+        /* Remote Git Mode */
+        <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-slate-100">
+            <Globe className="w-4 h-4 text-indigo-500" />
+            Clone &amp; Scan Public Git Repository
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Enter a public repository URL from GitHub, GitLab, or Bitbucket. Protected by SSRF filtering and safe archive streaming.
+          </p>
 
-        {selectedFile ? (
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-2">
-              <FileArchive className="w-4 h-4" />
-              <span>{selectedFile.name}</span>
-              <span className="opacity-80">({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Repository URL
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="https://github.com/owner/repository"
+                  value={remoteUrl}
+                  onChange={(e) => handleRemoteUrlChange(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              {urlValidation && (
+                <div className="mt-1 text-[11px]">
+                  {urlValidation.valid ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Valid {urlValidation.provider} repository: {urlValidation.owner}/{urlValidation.repo}
+                    </span>
+                  ) : (
+                    <span className="text-rose-500 font-semibold flex items-center gap-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {urlValidation.error}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Ready to scan. Click below to initiate discovery analysis, or select a different archive.
-            </p>
-          </div>
-        ) : (
-          <div>
-            <div className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-200 mb-1">
-              Drag &amp; drop repository .ZIP here, or click to browse
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Branch (Optional)
+              </label>
+              <div className="relative">
+                <GitBranch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="main (or master / develop)"
+                  value={remoteBranch}
+                  onChange={(e) => setRemoteBranch(e.target.value)}
+                  className="w-full pl-9 pr-3.5 py-2 text-xs rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-              Supports codebases in Python, JavaScript/TypeScript, Java, Go, C/C++, Rust, C#, PHP, Ruby, and configuration files. Maximum size: {settings.maxUploadSizeMb} MB.
-            </p>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Progress Bar & Pipeline Stepper (during scan) */}
       {isScanning && (
@@ -318,7 +474,7 @@ export const ScanPage: React.FC = () => {
           </div>
 
           <div className="text-[11px] text-slate-500 dark:text-slate-400">
-            Applying path traversal sanitization, zip bomb verification, and deterministic pattern matching across the 90-entry cryptographic catalog.
+            Applying SSRF filtering, path traversal sanitization, zip bomb verification, and deterministic pattern matching across the 90-entry cryptographic catalog.
           </div>
         </div>
       )}
@@ -441,9 +597,15 @@ export const ScanPage: React.FC = () => {
       <div className="flex items-center justify-end gap-3 pt-2">
         <button
           onClick={startScan}
-          disabled={!selectedFile || isScanning}
+          disabled={
+            isScanning ||
+            (scanMode === 'zip' && !selectedFile) ||
+            (scanMode === 'remote' && (!remoteUrl || (urlValidation && !urlValidation.valid)))
+          }
           className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all shadow-sm cursor-pointer ${
-            !selectedFile || isScanning
+            isScanning ||
+            (scanMode === 'zip' && !selectedFile) ||
+            (scanMode === 'remote' && (!remoteUrl || (urlValidation && !urlValidation.valid)))
               ? 'bg-slate-400 dark:bg-slate-800 text-slate-300 cursor-not-allowed opacity-60'
               : 'bg-indigo-600 hover:bg-indigo-500 hover:shadow-indigo-500/20 active:scale-[0.99]'
           }`}
@@ -465,3 +627,4 @@ export const ScanPage: React.FC = () => {
     </div>
   );
 };
+

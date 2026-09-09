@@ -153,6 +153,26 @@ export async function getAiAdvisory(finding: Finding): Promise<{
   advice: string;
   source: 'GEMINI_AI' | 'DETERMINISTIC_ENGINE';
 }> {
+  const isAes256 =
+    finding.algorithmName.toUpperCase().includes('AES-256') ||
+    (finding.algorithmName.toUpperCase().includes('AES') && String(finding.keySize || '').includes('256'));
+
+  if (isAes256) {
+    return {
+      advice:
+        `[Post-Quantum Cryptographic Advisory]\n\n` +
+        `Algorithm: ${finding.algorithmName} (256-bit Symmetric Key)\n\n` +
+        `Cryptographic Assessment:\n` +
+        `AES-256 remains quantum-resistant. Grover's algorithm reduces effective strength to 128 bits, which is still secure. Migration is NOT required.\n\n` +
+        `Implementation Verification Checklist:\n` +
+        `1. Ensure authenticated encryption mode is used (prefer AES-256-GCM or AES-256-CCM) rather than unauthenticated modes (CBC / ECB).\n` +
+        `2. Enforce strict nonce uniqueness for each encryption operation to prevent IV collision vulnerabilities.\n` +
+        `3. Maintain standard key rotation intervals and secure key storage using hardware-backed keystores (HSM / KMS).\n\n` +
+        `Note: Do NOT replace AES-256 with experimental primitives; standard AES-256 retains sufficient security margins well into the post-quantum era.`,
+      source: 'DETERMINISTIC_ENGINE',
+    };
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return {
@@ -167,7 +187,8 @@ export async function getAiAdvisory(finding: Finding): Promise<{
         `Implementation Checklist:\n` +
         `- Step 1: ${finding.remediation.developerNextStep}\n` +
         `- Step 2: Ensure crypto-agility by abstracting algorithm selection into an injectable provider.\n` +
-        `- Step 3: Run regression tests to verify payload format compatibility across consumers.`,
+        `- Step 3: Run regression tests to verify payload format compatibility across consumers.\n` +
+        `- Step 4: Do not silently rewrite code; verify compatibility using test suites and provide explicit diff reviews.`,
       source: 'DETERMINISTIC_ENGINE',
     };
   }
@@ -189,22 +210,27 @@ Finding details:
 - Code Snippet: ${finding.code}
 - Algorithm: ${finding.algorithmName} (${finding.algorithmType})
 - Category: ${finding.category}
+- Key Size: ${finding.keySize || 'N/A'}
 - Quantum Status: ${finding.quantumStatus}
 - Classical Status: ${finding.classicalSecurity}
 - Risk Level: ${finding.riskLevel} (Score: ${finding.riskScore}/100)
 - Priority: ${finding.priority}
 
 Provide a concise, highly technical migration advisory for enterprise engineering teams.
-Rules:
-1. Do not use generic marketing fluff.
-2. Use precise terminology (NIST FIPS 203 ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA, hybrid schemes, Mosca framework).
-3. If this is AES-256 or SHA-256, explain why Grover's algorithm leaves 128 bits of security and why it should NOT be replaced.
-4. If this is RSA or ECC, explain Shor's algorithm threat and recommend ML-KEM / ML-DSA.
-5. Provide 3 concrete developer steps.
-6. Emphasize that code must not be silently modified; changes must be carefully tested for backward compatibility.`;
+Strict Rules:
+1. Explain WHY the algorithm is vulnerable (e.g. Shor's algorithm polynomial time factoring/discrete log for RSA/ECC, collision attacks for MD5/SHA1, Grover halving for symmetric keys < 256 bits).
+2. Recommend the appropriate post-quantum replacement algorithm:
+   - RSA / ECC key exchange -> ML-KEM (Kyber / FIPS 203) or hybrid (X25519 + ML-KEM-768)
+   - RSA / ECDSA signatures -> ML-DSA (Dilithium / FIPS 204) or SLH-DSA (SPHINCS+ / FIPS 205)
+   - Weak hashing (MD5, SHA-1) -> SHA-256 / SHA-3 (FIPS 202)
+   - Symmetric keys < 256 bits (e.g. AES-128, 3DES) -> AES-256-GCM
+3. If AES-256 is detected, do NOT recommend replacing it:
+   Explain: 'AES-256 remains quantum-resistant. Grover's algorithm reduces effective strength to 128 bits, which is still secure. Migration is NOT required.'
+4. Give concrete developer next steps (abstract behind cryptographic provider, verify ciphertext/key buffer allocations, test backward compatibility).
+5. Do NOT silently rewrite files. Provide clear code diff preview and instructions.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
     });
 

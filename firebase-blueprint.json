@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "User": {
+      "collection": "users",
+      "fields": {
+        "uid": { "type": "string", "description": "User UID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "Display name" },
+        "createdAt": { "type": "string", "description": "Account creation timestamp" }
+      }
+    },
+    "UserAlgorithm": {
+      "collection": "users/{userId}/algorithms",
+      "fields": {
+        "id": { "type": "string", "description": "Unique algorithm ID" },
+        "userId": { "type": "string", "description": "Owner user UID" },
+        "algorithmName": { "type": "string", "description": "Name of algorithm e.g. RSA-2048, AES-256" },
+        "algorithmType": { "type": "string", "description": "Cryptographic category" },
+        "keySize": { "type": "string", "description": "Key size or curve e.g. 2048, 256" },
+        "cryptographicPurpose": { "type": "string", "description": "Purpose e.g. DIGITAL_SIGNATURE, KEY_EXCHANGE_KEM" },
+        "usage": { "type": "string", "description": "Usage context e.g. Active, Config, Archive" },
+        "environment": { "type": "string", "description": "Production, Staging, Development" },
+        "dataSensitivity": { "type": "string", "description": "CRITICAL, HIGH, MEDIUM, LOW" },
+        "internetFacing": { "type": "boolean", "description": "Whether component is exposed to public internet" },
+        "lifetimeYears": { "type": "number", "description": "Certificate or data lifetime in years" },
+        "component": { "type": "string", "description": "Application or component name" },
+        "notes": { "type": "string", "description": "Developer notes" },
+        "riskScore": { "type": "number", "description": "Calculated risk score 0-100" },
+        "riskLevel": { "type": "string", "description": "MINIMAL, LOW, MEDIUM, HIGH, CRITICAL" },
+        "priority": { "type": "string", "description": "P1, P2, P3, P4" },
+        "createdAt": { "type": "string", "description": "Timestamp created" }
+      }
+    },
+    "UserScan": {
+      "collection": "users/{userId}/scans",
+      "fields": {
+        "id": { "type": "string", "description": "Scan session ID" },
+        "userId": { "type": "string", "description": "Owner user UID" },
+        "repoName": { "type": "string", "description": "Scanned repository or archive name" },
+        "uploadedAt": { "type": "string", "description": "Scan timestamp" },
+        "fileCount": { "type": "number", "description": "Total files scanned" },
+        "totalFindings": { "type": "number", "description": "Total findings count" },
+        "averageRiskScore": { "type": "number", "description": "Average risk score 0-100" },
+        "riskLevel": { "type": "string", "description": "Aggregated risk level" },
+        "criticalRisks": { "type": "number", "description": "Number of critical findings" },
+        "highRisks": { "type": "number", "description": "Number of high findings" },
+        "p1Candidates": { "type": "number", "description": "P1 immediate migration candidates" },
+        "overallQuantumPosture": { "type": "string", "description": "Overall quantum exposure" },
+        "findings": { "type": "array", "description": "Array of finding objects" },
+        "stats": { "type": "object", "description": "Summary statistics" }
+      }
+    }
+  }
+}
